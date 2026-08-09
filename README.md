@@ -1,6 +1,6 @@
-# Neovim 配置操作手册 — `master` 分支
+# Neovim 配置操作手册 — `embedded-conf` 分支
 
-> **分支定位**: 通用 C/C++/Rust 开发环境，侧重代码格式化与原生 LSP 体验。
+> **分支定位**: 嵌入式 ARM Cortex-M 开发环境，集成 OpenOCD + GDB 片上调试 (On-Chip Debugging)。
 > **插件管理器**: [lazy.nvim](https://github.com/folke/lazy.nvim)
 > **Leader 键**: `<Space>`
 
@@ -83,6 +83,7 @@
 - 终端大小固定 (15 行)，关闭时保留上一次大小
 - 终端退出后自动关闭窗口
 - 终端背景带阴影效果 (`shade_terminals: true`)
+- **嵌入式场景**: 可在此终端中运行 `openocd`、`make`、`gdb` 等命令行工具
 
 ---
 
@@ -120,11 +121,6 @@
 | `<Space>wk` | 当前窗口与上方对调 |
 | `<Space>wl` | 当前窗口与右侧对调 |
 
-### 特性
-
-- 当光标撞到窗口边缘时停止移动 (`at_edge` 模式)
-- 忽略 quickfix / nvim-tree 等特殊窗口类型，避免意外跳转
-
 ---
 
 ## 4. 注释 (Comment.nvim)
@@ -147,7 +143,7 @@
 
 - 注释符号与代码之间自动加空格
 - 注释后光标保持原位置 (`sticky: true`)
-- 自动识别文件类型，使用正确的注释符号
+- 自动识别文件类型，支持 C、汇编 (`.s`/`.S`) 等嵌入式常见语言
 
 ---
 
@@ -185,10 +181,12 @@
 
 Neovim 原生 LSP 配置 (`vim.lsp.config`)，不依赖 `nvim-lspconfig`：
 
-- 后端: `clangd-18`
-- 参数: `--background-index` (后台建索引), `--header-insertion=never` (不自动插头文件)
-- 支持文件类型: `c`, `cpp`, `h`, `hpp`
-- 根目录识别: `compile_commands.json` > `compile_flags.txt` > `.git`
+- **后端**: `clangd-18`
+- **参数**: `--background-index` (后台建索引), `--header-insertion=never` (不自动插头文件)
+- **支持文件类型**: `c`, `cpp`, `h`, `hpp`
+- **根目录识别**: `compile_commands.json` > `compile_flags.txt` > `.git`
+
+> 用于嵌入式项目时，建议生成 `compile_commands.json`（CMake: `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`，或使用 `bear` 工具），这样 clangd 可以正确解析交叉编译的头文件和宏定义。
 
 ### Rust LSP
 
@@ -257,23 +255,101 @@ Neovim 原生 LSP 配置 (`vim.lsp.config`)，不依赖 `nvim-lspconfig`：
 
 ## 8. ARM 嵌入式调试 (DAP + OpenOCD + GDB) — 与 master 的唯一差异
 
-**插件**: [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)
-**配置文件**: `lua/plugins/c-cpp.lua` (symlink → Embedded-nvim)
+**插件**: [mfussenegger/nvim-dap](https://github.com/mfussenegger/nvim-dap) + [rcarriga/nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) + [theHamsta/nvim-dap-virtual-text](https://github.com/theHamsta/nvim-dap-virtual-text)
+**配置文件**: `lua/plugins/dap-arm.lua` (symlink → Embedded-nvim)
 
-### master 分支独有特性
+> 这是 `embedded-conf` 分支与 `master` 的核心区别。此配置实现了在 Neovim 内一键烧录 + 调试 ARM Cortex-M 芯片的完整工作流。
 
-C/C++ 保存时自动用 `clang-format` 格式化：
+### 前置依赖
 
-- **格式化时机**: `BufWritePre` (保存前自动执行)
-- **命令**: `clang-format --style=file` (读取项目根目录的 `.clang-format` 配置文件)
-- **超时**: 5000ms
-- **fallback**: 若 `clang-format` 失败，退回到 LSP 格式化
+| 工具 | 用途 | 安装 |
+|------|------|------|
+| `arm-none-eabi-gdb` 或 `gdb-multiarch` | GDB 调试后端 | `apt install gdb-multiarch` |
+| `openocd` | 片上调试服务器 (连接 DAPLink/ST-Link/J-Link) | `apt install openocd` |
+| 调试器硬件 | DAPLink / ST-Link / J-Link | 物理连接目标 MCU |
 
-### 手动格式化
+### 项目结构要求
+
+```
+你的嵌入式项目/
+├── openocd/
+│   ├── stm32f1/daplink.cfg
+│   ├── stm32f4/daplink.cfg
+│   └── stm32h7/daplink.cfg
+├── build/
+│   └── main.elf          (编译产物)
+└── src/
+    └── main.c
+```
+
+### MCU 自动识别
+
+配置根据 ELF 文件名自动推测 MCU 系列：
+
+| 文件名包含 | 识别的 MCU | OpenOCD 配置 |
+|------------|------------|---------------|
+| `stm32f1`, `f103`, `bullet` | stm32f1 | `openocd/stm32f1/daplink.cfg` |
+| `h7`, `mc02` | stm32h7 | `openocd/stm32h7/daplink.cfg` |
+| 其他 (默认) | stm32f4 | `openocd/stm32f4/daplink.cfg` |
+
+### ELF 文件定位逻辑
+
+1. 首先在同目录查找 `<当前文件名>.elf`
+2. 其次在 `build/` 目录查找 `build/<当前文件名>.elf`
+
+### 一键烧录 + 调试
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<Space>dd` | 启动 ARM Flash & Debug 完整流程 |
+
+**工作流程**:
+
+1. 按 `<Space>dd`
+2. 自动打开新标签页运行 `openocd -f openocd/<mcu>/daplink.cfg`
+3. 等待 OpenOCD 连接调试器 (最多 5 秒)
+4. 连接成功后通过 GDB 执行 `monitor reset halt` + `load` 烧录 ELF
+5. 自动打开 DAP UI 调试面板
+
+### 手动命令
 
 | 命令 | 功能 |
 |------|------|
-| `:ConformInfo` | 查看格式化状态和可用 formatter |
+| `:ArmDebug` | 手动触发 ARM Flash & Debug |
+
+### DAP 调试面板 (nvim-dap-ui)
+
+调试启动后自动显示：
+
+- **Variables**: 变量查看
+- **Watch**: 监视表达式
+- **Call Stack**: 调用栈
+- **Breakpoints**: 断点列表
+- **Scopes**: 作用域变量
+
+### DAP 调试快捷键
+
+DAP 使用标准的 nvim-dap 快捷键：
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<F5>` | 继续执行 (Continue) |
+| `<F10>` | 单步跳过 (Step Over) |
+| `<F11>` | 单步进入 (Step Into) |
+| `<F12>` | 单步跳出 (Step Out) |
+| `<Leader>db` | 切换断点 (Toggle Breakpoint) |
+| `<Leader>dB` | 条件断点 |
+| `<Leader>dr` | 打开 REPL |
+| `<Leader>dl` | 运行到光标处 |
+
+### 内联变量显示 (nvim-dap-virtual-text)
+
+调试时在代码行尾直接显示变量值，无需查看 Variables 面板：
+
+```c
+int counter = 0;           // → counter = 42
+uint32_t status = READY;   // → status = 0x0003
+```
 
 ---
 
@@ -345,14 +421,7 @@ cst<div>   → <div>hello</div>   (t = tag)
 - **保存时 Clippy 检查**: `checkOnSave.command = "clippy"`
 - **内联类型提示**: `inlayHints.enable = true`
 
-### DAP 调试
-
-| 行为 | 说明 |
-|------|------|
-| 启动调试 | DAP UI 面板自动打开 |
-| 停止/退出调试 | DAP UI 面板自动关闭 |
-
-> 需要安装对应语言的调试器 (如 `codelldb` 或 `lldb-vscode`)。
+> 可用于嵌入式 Rust (如 `no_std` + `cortex-m` 系列 crate) 开发。
 
 ---
 
@@ -453,16 +522,16 @@ cst<div>   → <div>hello</div>   (t = tag)
 | nvim-surround | https://github.com/kylechui/nvim-surround |
 | telescope.nvim | https://github.com/nvim-telescope/telescope.nvim |
 | nvim-treesitter | https://github.com/nvim-treesitter/nvim-treesitter |
-| conform.nvim | https://github.com/stevearc/conform.nvim |
 | rustaceanvim | https://github.com/mrcjkb/rustaceanvim |
 | nvim-dap | https://github.com/mfussenegger/nvim-dap |
 | nvim-dap-ui | https://github.com/rcarriga/nvim-dap-ui |
+| nvim-dap-virtual-text | https://github.com/theHamsta/nvim-dap-virtual-text |
 | render-markdown.nvim | https://github.com/MeanderingProgrammer/render-markdown.nvim |
 | vscode.nvim (主题) | https://github.com/Mofiqul/vscode.nvim |
 
 ---
 
-## master 分支特点总结
+## embedded-conf 分支特点总结
 
 - **C/C++ 代码格式化**: `conform.nvim` + `clang-format` 保存时自动格式化
 - **LSP**: Neovim 原生 LSP (`clangd-18`)，无需 `nvim-lspconfig`
