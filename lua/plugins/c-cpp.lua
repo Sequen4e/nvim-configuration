@@ -1,0 +1,1 @@
+/home/sq4e/src/Embedded-nvim/nvim/lua/plugins/c-cpp.lua

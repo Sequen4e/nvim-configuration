@@ -2,12 +2,11 @@
 vim.opt.relativenumber = true
 
 require("config.lazy")
-
 require("config.keymaps")
-
 require("config.options")
+require("config.lsp")
 
--- 统一全局规则：让 LSP 只负责“补全和跳转”，把“彩色高亮”完全交给 Treesitter
+-- Let Treesitter handle highlighting, not LSP semantic tokens
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
     local client = vim.lsp.get_client_by_id(args.data.client_id)
