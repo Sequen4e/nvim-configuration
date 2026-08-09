@@ -1,6 +1,6 @@
 # Neovim 配置操作手册 — `master` 分支
 
-> **分支定位**: 通用 C/C++/Rust 开发环境，侧重代码格式化与原生 LSP 体验。
+> **分支定位**: 通用 C/C++/Rust 开发环境，`embedded-conf` 分支在此基础上增加 ARM 嵌入式调试。
 > **插件管理器**: [lazy.nvim](https://github.com/folke/lazy.nvim)
 > **Leader 键**: `<Space>`
 
@@ -15,12 +15,11 @@
 5. [自动配对符号 (nvim-autopairs)](#5-自动配对符号-nvim-autopairs)
 6. [LSP 配置与定义跳转](#6-lsp-配置与定义跳转)
 7. [代码格式化 (conform.nvim + clang-format)](#7-代码格式化-conformnvim--clang-format)
-8. [ARM 嵌入式调试 (DAP + OpenOCD + GDB) — 与 master 的唯一差异](#8-arm-嵌入式调试-dap--openocd--gdb--与-master-的唯一差异)
-9. [包围符号 (nvim-surround)](#9-包围符号-nvim-surround)
-10. [语法高亮 (Treesitter)](#10-语法高亮-treesitter)
-11. [Rust 开发 (Rustaceanvim + DAP)](#11-rust-开发-rustaceanvim--dap)
-12. [Markdown 渲染](#12-markdown-渲染)
-13. [完整快捷键速查表](#13-完整快捷键速查表)
+8. [包围符号 (nvim-surround)](#8-包围符号-nvim-surround)
+9. [语法高亮 (Treesitter)](#9-语法高亮-treesitter)
+10. [Rust 开发 (Rustaceanvim + DAP)](#10-rust-开发-rustaceanvim--dap)
+11. [Markdown 渲染](#11-markdown-渲染)
+12. [完整快捷键速查表](#12-完整快捷键速查表)
 
 ---
 
@@ -33,14 +32,14 @@
 
 | 快捷键 | 功能 |
 |--------|------|
-| `<Space>e` | 切换文件树 (左侧) |
+| `<Space>e` | 切换文件树 (左侧面板) |
 
 ### 文件树内操作
 
 | 按键 | 功能 |
 |------|------|
 | `Enter` | 打开文件/目录 |
-| `a` | 新建文件 (在光标位置) |
+| `a` | 新建文件 |
 | `d` | 删除文件/目录 |
 | `r` | 重命名 |
 | `m` | 移动 |
@@ -49,13 +48,13 @@
 | `/` | 搜索文件 (模糊匹配) |
 | `<C-x>` / `<C-v>` | 水平/垂直分屏打开 |
 | `R` | 刷新目录树 |
-| `q` | 关闭 Neo-tree 窗口 |
+| `q` | 关闭 Neo-tree |
 
 ### 特性
 
 - 窗口宽度 30 列，位于左侧
 - 打开文件时自动定位到当前文件 (`follow_current_file: true`)
-- 默认显示 `.gitignore` 中的文件 (`visible: true`)
+- 显示所有文件，包括 `.gitignore` 中的项 (`visible: true`)
 
 ---
 
@@ -68,7 +67,7 @@
 
 | 快捷键 | 功能 |
 |--------|------|
-| `<C-t>` | 切换底部终端面板 (默认方向: horizontal, 高度 15 行) |
+| `<C-t>` | 切换底部终端面板 (水平方向，高度 15 行) |
 | `<Space>th` | 水平方向打开终端 |
 
 ### 终端模式快捷键
@@ -80,9 +79,9 @@
 
 ### 特性
 
-- 终端大小固定 (15 行)，关闭时保留上一次大小
-- 终端退出后自动关闭窗口
-- 终端背景带阴影效果 (`shade_terminals: true`)
+- 高度固定 15 行，关闭后记住上次大小
+- 退出 shell 后自动关闭终端窗口
+- 终端背景带阴影效果
 
 ---
 
@@ -104,12 +103,12 @@
 
 | 快捷键 | 功能 |
 |--------|------|
-| `<A-h>` | 向左拉伸/压缩窗口 |
-| `<A-j>` | 向下拉伸/压缩窗口 |
-| `<A-k>` | 向上拉伸/压缩窗口 |
-| `<A-l>` | 向右拉伸/压缩窗口 |
+| `<A-h>` | 向左拉伸/压缩 |
+| `<A-j>` | 向下拉伸/压缩 |
+| `<A-k>` | 向上拉伸/压缩 |
+| `<A-l>` | 向右拉伸/压缩 |
 
-> 按下后进入 resize 模式，用 `h/j/k/l` 或方向键调整，`<Esc>` 退出。
+> 按下后进入 resize 模式，用 `h/j/k/l` 微调，`<Esc>` 退出。
 
 ### 窗口位置互换
 
@@ -119,11 +118,6 @@
 | `<Space>wj` | 当前窗口与下方对调 |
 | `<Space>wk` | 当前窗口与上方对调 |
 | `<Space>wl` | 当前窗口与右侧对调 |
-
-### 特性
-
-- 当光标撞到窗口边缘时停止移动 (`at_edge` 模式)
-- 忽略 quickfix / nvim-tree 等特殊窗口类型，避免意外跳转
 
 ---
 
@@ -145,9 +139,9 @@
 
 ### 特性
 
-- 注释符号与代码之间自动加空格
-- 注释后光标保持原位置 (`sticky: true`)
-- 自动识别文件类型，使用正确的注释符号
+- 注释符号与代码间自动加空格
+- 注释后光标保持原位 (`sticky: true`)
+- 自动识别文件类型使用正确的注释符号
 
 ---
 
@@ -156,23 +150,23 @@
 **插件**: [windwp/nvim-autopairs](https://github.com/windwp/nvim-autopairs)
 **配置文件**: `lua/plugins/autopairs.lua`
 
-### 自动配对功能
+### 自动配对
 
 输入 `(` → 自动补全 `(|)`，光标位于中间。
-支持所有常见括号: `()` `[]` `{}` `""` `''`
+支持: `()` `[]` `{}` `""` `''`
 
 ### 功能细节
 
 | 行为 | 说明 |
 |------|------|
-| 自动跳过右括号 | 光标前有 `)` 时按 `)` 直接跳过，不重复输入 |
+| 自动跳过右括号 | 光标前已有 `)` 时按 `)` 不重复输入，直接跳过 |
 | 智能退格 | 光标在 `(|)` 中按退格，同时删除左右括号 |
-| 快速包裹 | `<A-e>` 把光标后的单词用括号包裹起来 |
+| 快速包裹 | `<A-e>` 将光标后单词用括号包裹 |
 | Treesitter 校验 | 不在字符串/注释内误补全 |
 
 ### 快速包裹 (FastWrap)
 
-在插入模式按 `<A-e>`，自动选中光标后单词，再按 `(` / `"` / `'` 等即可包裹。
+插入模式下按 `<A-e>`，自动选中光标后单词，再按 `(` / `"` / `'` 等即完成包裹。
 
 ---
 
@@ -183,27 +177,27 @@
 
 ### C/C++ LSP (clangd)
 
-Neovim 原生 LSP 配置 (`vim.lsp.config`)，不依赖 `nvim-lspconfig`：
+Neovim 原生 LSP 配置，不依赖 `nvim-lspconfig`：
 
-- 后端: `clangd-18`
-- 参数: `--background-index` (后台建索引), `--header-insertion=never` (不自动插头文件)
-- 支持文件类型: `c`, `cpp`, `h`, `hpp`
-- 根目录识别: `compile_commands.json` > `compile_flags.txt` > `.git`
+- **后端**: `clangd-18`
+- **参数**: `--background-index` (后台索引), `--header-insertion=never` (不自动插入头文件)
+- **支持文件类型**: `c`, `cpp`, `h`, `hpp`
+- **根目录识别**: `compile_commands.json` > `compile_flags.txt` > `.git`
 
 ### Rust LSP
 
-由 `rustaceanvim` 内置集成 `rust-analyzer`，详见[第 11 节](#11-rust-开发-rustaceanvim--dap)。
+由 `rustaceanvim` 内置集成 `rust-analyzer`，详见[第 10 节](#10-rust-开发-rustaceanvim--dap)。
 
 ### 核心跳转快捷键
 
 | 快捷键 | 功能 | 说明 |
 |--------|------|------|
-| `gd` | 跳转到定义 | 通过 Telescope 弹窗选择 (仅一个定义时直接跳转) |
-| `gr` | 查找所有引用 | Telescope 实时预览列表 |
+| `gd` | 跳转到定义 | Telescope 弹窗选择 (仅一个定义时直接跳转) |
+| `gr` | 查找所有引用 | Telescope 实时预览 |
 | `gy` | 跳转到类型定义 | Type Definition |
 | `gI` | 跳转到实现 | Interface/Trait 的具体实现 |
 | `K` | 悬浮文档 | 原生浮动窗口，显示符号签名与文档 |
-| `gl` | 查看行诊断 | 浮动窗口显示当前行错误/警告 |
+| `gl` | 行诊断 | 浮动窗口显示当前行错误/警告 |
 
 ### 符号搜索
 
@@ -216,9 +210,9 @@ Neovim 原生 LSP 配置 (`vim.lsp.config`)，不依赖 `nvim-lspconfig`：
 
 | 快捷键 | 功能 |
 |--------|------|
-| `<Space>xx` | 列出全项目诊断错误/警告（Telescope） |
+| `<Space>xx` | 列出全项目诊断错误/警告 (Telescope) |
 | `<Space>rn` | 重命名符号 |
-| `<Space>ca` | 代码操作 (修复建议 / 重构) |
+| `<Space>ca` | 代码操作 (修复建议/重构) |
 
 ### Telescope 通用操作
 
@@ -251,33 +245,9 @@ Neovim 原生 LSP 配置 (`vim.lsp.config`)，不依赖 `nvim-lspconfig`：
 |------|------|
 | `:ConformInfo` | 查看格式化状态和可用 formatter |
 
-> 嵌入式项目中建议配置 `.clang-format` 以匹配团队代码风格。
-
 ---
 
-## 8. ARM 嵌入式调试 (DAP + OpenOCD + GDB) — 与 master 的唯一差异
-
-**插件**: [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)
-**配置文件**: `lua/plugins/c-cpp.lua` (symlink → Embedded-nvim)
-
-### master 分支独有特性
-
-C/C++ 保存时自动用 `clang-format` 格式化：
-
-- **格式化时机**: `BufWritePre` (保存前自动执行)
-- **命令**: `clang-format --style=file` (读取项目根目录的 `.clang-format` 配置文件)
-- **超时**: 5000ms
-- **fallback**: 若 `clang-format` 失败，退回到 LSP 格式化
-
-### 手动格式化
-
-| 命令 | 功能 |
-|------|------|
-| `:ConformInfo` | 查看格式化状态和可用 formatter |
-
----
-
-## 9. 包围符号 (nvim-surround)
+## 8. 包围符号 (nvim-surround)
 
 **插件**: [kylechui/nvim-surround](https://github.com/kylechui/nvim-surround)
 **配置文件**: `lua/plugins/nvim-surround.lua`
@@ -286,10 +256,10 @@ C/C++ 保存时自动用 `clang-format` 格式化：
 
 | 快捷键 | 功能 | 示例 |
 |--------|------|------|
-| `ys{motion}{char}` | 添加包围符 | `ysiw"` → 单词外加上双引号 |
+| `ys{motion}{char}` | 添加包围符 | `ysiw"` → 单词外加双引号 |
 | `ds{char}` | 删除包围符 | `ds"` → 删除最近的 `"..."` |
 | `cs{old}{new}` | 替换包围符 | `cs"'` → 双引号换单引号 |
-| `S{char}` (Visual 模式) | 给选中文本加包围 | 选中后按 `S(` → `(selected text)` |
+| `S{char}` (Visual) | 包围选中文本 | 选中后按 `S(` → `(selected text)` |
 
 ### 常用例子
 
@@ -298,23 +268,23 @@ ysiw(      → (word)
 ysiw"      → "word"
 ds(        → 去掉括号
 cs"'       → "hello" → 'hello'
-cst<div>   → <div>hello</div>   (t = tag)
+cst<div>   → <div>hello</div>  (t = tag)
 ```
 
 ---
 
-## 10. 语法高亮 (Treesitter)
+## 9. 语法高亮 (Treesitter)
 
 **插件**: [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
 **配置文件**: `lua/plugins/treesitter.lua`
 
-### 已安装的语言
+### 已安装语言
 
 `rust` · `lua` · `vim` · `vimdoc` · `python` · `c` · `cpp` · `bash` · `markdown`
 
 ### 功能
 
-- **语法高亮**: Treesitter 接管所有高亮（禁用 LSP semantic tokens，避免冲突）
+- **语法高亮**: Treesitter 接管所有高亮 (禁用 LSP semantic tokens)
 - **智能缩进**: `indent: true`
 
 ### 常用命令
@@ -327,7 +297,7 @@ cst<div>   → <div>hello</div>   (t = tag)
 
 ---
 
-## 11. Rust 开发 (Rustaceanvim + DAP)
+## 10. Rust 开发 (Rustaceanvim + DAP)
 
 **插件**: [mrcjkb/rustaceanvim](https://github.com/mrcjkb/rustaceanvim) + [mfussenegger/nvim-dap](https://github.com/mfussenegger/nvim-dap)
 **配置文件**: `lua/plugins/rust.lua`
@@ -347,25 +317,22 @@ cst<div>   → <div>hello</div>   (t = tag)
 
 ### DAP 调试
 
-| 行为 | 说明 |
-|------|------|
-| 启动调试 | DAP UI 面板自动打开 |
-| 停止/退出调试 | DAP UI 面板自动关闭 |
+启动调试时 DAP UI 面板自动打开，停止/退出时自动关闭。
 
-> 需要安装对应语言的调试器 (如 `codelldb` 或 `lldb-vscode`)。
+> 需要安装对应调试器 (如 `codelldb` 或 `lldb-vscode`)。
 
 ---
 
-## 12. Markdown 渲染
+## 11. Markdown 渲染
 
 **插件**: [MeanderingProgrammer/render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim)
 **配置文件**: `lua/plugins/markdown.lua`
 
-在 Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等，所见即所得。
+Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等，所见即所得。
 
 ---
 
-## 13. 完整快捷键速查表
+## 12. 完整快捷键速查表
 
 ### 通用
 
@@ -375,7 +342,7 @@ cst<div>   → <div>hello</div>   (t = tag)
 | `<C-t>` | 切换终端 |
 | `<Space>th` | 水平终端 |
 | `<C-c>` (Visual) | 复制到系统剪贴板 |
-| `d` (Normal/Visual) | 删除 (不覆盖剪贴板，使用黑洞寄存器 `"_d`) |
+| `d` (Normal/Visual) | 删除 (不覆盖剪贴板，黑洞寄存器 `"_d`) |
 
 ### 窗口管理
 
@@ -401,18 +368,15 @@ cst<div>   → <div>hello</div>   (t = tag)
 | `<Space>rn` | 重命名 |
 | `<Space>ca` | 代码操作 |
 
-### ARM 调试 (与 master 的唯一差异)
+### Rust 调试 (DAP)
 
 | 快捷键 | 功能 |
 |--------|------|
-| `<Space>dd` | ARM Flash & Debug (一键烧录+调试) |
-| `:ArmDebug` | 手动触发 ARM 调试 |
 | `<F5>` | 继续执行 |
 | `<F10>` | 单步跳过 |
 | `<F11>` | 单步进入 |
 | `<F12>` | 单步跳出 |
 | `<Leader>db` | 切换断点 |
-| `<Leader>dB` | 条件断点 |
 
 ### 注释
 
@@ -436,7 +400,7 @@ cst<div>   → <div>hello</div>   (t = tag)
 | 快捷键 | 功能 |
 |--------|------|
 | `<A-e>` | 快速包裹 (autopairs) |
-| 自动 `()` `[]` `{}` `""` `''` | 输入左符号自动配对右符号 |
+| `(` `[` `{` `"` `'` | 自动配对 |
 
 ---
 
@@ -459,19 +423,3 @@ cst<div>   → <div>hello</div>   (t = tag)
 | nvim-dap-ui | https://github.com/rcarriga/nvim-dap-ui |
 | render-markdown.nvim | https://github.com/MeanderingProgrammer/render-markdown.nvim |
 | vscode.nvim (主题) | https://github.com/Mofiqul/vscode.nvim |
-
----
-
-## master 分支特点总结
-
-- **C/C++ 代码格式化**: `conform.nvim` + `clang-format` 保存时自动格式化
-- **LSP**: Neovim 原生 LSP (`clangd-18`)，无需 `nvim-lspconfig`
-- **调试**: Rust DAP (nvim-dap + nvim-dap-ui)
-- **通用开发**: 适合日常 C/C++/Rust 项目开发，侧重代码整洁度
-- **clang-format**: 保存时自动格式化 C/C++ 代码 (conform.nvim)
-- **ARM Cortex-M 片上调试**: DAP + OpenOCD + arm-none-eabi-gdb 全集成（与 `master` 的唯一差异）
-- **一键烧录+调试**: `<Space>dd` 自动打开 OpenOCD、连接 GDB、烧录 ELF、启动 DAP UI
-- **内联变量显示**: 调试时直接在代码行尾显示变量数值
-- **自动 MCU 识别**: 根据 ELF 文件名自动匹配 stm32f1/f4/h7 的 OpenOCD 配置
-- **LSP**: Neovim 原生 LSP (`clangd-18`)，适合嵌入式 C 项目的 `compile_commands.json` 工作流
-- **适合场景**: STM32 裸机/RTOS 开发，ARM Cortex-M 系列 MCU
