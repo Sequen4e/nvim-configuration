@@ -14,17 +14,29 @@ return {
       easing = "quadratic", -- 物理平滑缓动
     })
 
-    -- 2. 预定义平滑滚动 API (半页 200ms / 整页 250ms)
+    -- 2. 预定义平滑滚动 API (使用 neoscroll 最新 API 签名)
     local function scroll_half_down()
-      neoscroll.scroll(0.5, true, 200)
+      neoscroll.scroll(0.5, { move_cursor = true, duration = 200 })
     end
     local function scroll_half_up()
-      neoscroll.scroll(-0.5, true, 200)
+      neoscroll.scroll(-0.5, { move_cursor = true, duration = 200 })
+    end
+    local function scroll_down()
+      neoscroll.ctrl_f({ duration = 250 })
+    end
+    local function scroll_up()
+      neoscroll.ctrl_b({ duration = 250 })
     end
 
-    -- 3. 按键映射预留区（后续确定键位后，取消对应注释即可）
+    -- 3. 按键映射预留区
     local keymap = vim.keymap.set
     local opts = { noremap = true, silent = true }
+
+    -- [default]
+    keymap("n", "<C-u>", scroll_half_up,   vim.tbl_extend("force", opts, { desc = "向上平滑翻半页" }))
+    keymap("n", "<C-d>", scroll_half_down, vim.tbl_extend("force", opts, { desc = "向下平滑翻半页" }))
+    keymap("n", "<C-f>", scroll_down,   vim.tbl_extend("force", opts, { desc = "向下平滑翻页" }))
+    keymap("n", "<C-b>", scroll_up, vim.tbl_extend("force", opts, { desc = "向上平滑翻页" }))
 
     -- 【方案 A】：方括号 [ (上翻) 与 ] (下翻)
     -- keymap("n", "]", scroll_half_down, vim.tbl_extend("force", opts, { desc = "向下平滑翻半页" }))
