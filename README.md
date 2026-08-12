@@ -1,6 +1,6 @@
 # Neovim 配置操作手册
 
-> **定位**: 嵌入式 ARM Cortex-M 开发环境，集成 OpenOCD + GDB 片上调试、clang-format 自动格式化与原生 LSP。
+> 面向嵌入式 ARM Cortex-M 与多语言 (C/C++ · Rust · Python) 开发，集成片上调试、自动格式化与原生 LSP。
 > **插件管理器**: [lazy.nvim](https://github.com/folke/lazy.nvim)
 > **Leader 键**: `<Space>`
 
@@ -13,14 +13,18 @@
 3. [窗口管理 (Smart-Splits)](#3-窗口管理-smart-splits)
 4. [注释 (Comment.nvim)](#4-注释-commentnvim)
 5. [自动配对符号 (nvim-autopairs)](#5-自动配对符号-nvim-autopairs)
-6. [LSP 配置与定义跳转](#6-lsp-配置与定义跳转)
-7. [代码格式化 (conform.nvim + clang-format)](#7-代码格式化-conformnvim--clang-format)
-8. [ARM 嵌入式调试 (DAP + OpenOCD + GDB)](#8-arm-嵌入式调试-dap--openocd--gdb)
-9. [包围符号 (nvim-surround)](#9-包围符号-nvim-surround)
-10. [语法高亮 (Treesitter)](#10-语法高亮-treesitter)
-11. [Rust 开发 (Rustaceanvim + DAP)](#11-rust-开发-rustaceanvim--dap)
-12. [Markdown 渲染](#12-markdown-渲染)
-13. [完整快捷键速查表](#13-完整快捷键速查表)
+6. [LSP 配置与定义跳转 (Mason + Telescope)](#6-lsp-配置与定义跳转-mason--telescope)
+7. [代码格式化 (conform.nvim)](#7-代码格式化-conformnvim)
+8. [Python 开发 (pyright + ruff)](#8-python-开发-pyright--ruff)
+9. [Rust 开发 (Rustaceanvim)](#9-rust-开发-rustaceanvim)
+10. [ARM 嵌入式调试 (DAP + OpenOCD + GDB)](#10-arm-嵌入式调试-dap--openocd--gdb)
+11. [包围符号 (nvim-surround)](#11-包围符号-nvim-surround)
+12. [语法高亮 (Treesitter)](#12-语法高亮-treesitter)
+13. [彩虹括号 (rainbow-delimiters)](#13-彩虹括号-rainbow-delimiters)
+14. [缩进指示线 (indent-blankline)](#14-缩进指示线-indent-blankline)
+15. [平滑滚动 (neoscroll)](#15-平滑滚动-neoscroll)
+16. [Markdown 渲染](#16-markdown-渲染)
+17. [完整快捷键速查表](#17-完整快捷键速查表)
 
 ---
 
@@ -33,7 +37,7 @@
 
 | 快捷键 | 功能 |
 |--------|------|
-| `<Space>e` | 切换文件树 (左侧面板) |
+| `<Space>e` | 切换文件树 (左侧面板，宽 25 列) |
 
 ### 文件树内操作
 
@@ -46,16 +50,21 @@
 | `m` | 移动 |
 | `c` | 复制 |
 | `H` | 切换显示隐藏文件 |
-| `/` | 搜索文件 (模糊匹配) |
+| `/` | 模糊搜索过滤 (树内实时高亮匹配) |
+| `f` | 输入过滤条件，`Enter` 确认 |
+| `zM` | 全部折叠 |
+| `zR` | 全部展开 |
+| `.` | 将光标下文件夹设为临时根目录 |
+| `u` | 返回上一层根目录 |
 | `<C-x>` / `<C-v>` | 水平/垂直分屏打开 |
 | `R` | 刷新目录树 |
 | `q` | 关闭 Neo-tree |
 
 ### 特性
 
-- 窗口宽度 30 列，位于左侧
 - 打开文件时自动定位到当前文件 (`follow_current_file: true`)
-- 显示所有文件，包括 `.gitignore` 中的项 (`visible: true`)
+- 显示所有文件，包括 `.gitignore` 中的项
+- 文件树是最后一个窗口时允许关闭 (`close_if_last_window: true`)
 
 ---
 
@@ -172,25 +181,27 @@
 
 ---
 
-## 6. LSP 配置与定义跳转
+## 6. LSP 配置与定义跳转 (Mason + Telescope)
 
-**LSP 配置文件**: `lua/config/lsp.lua` + `lua/config/keymaps.lua`
-**搜索后端**: [nvim-telescope/telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
+**LSP 服务器管理**: [williamboman/mason.nvim](https://github.com/williamboman/mason.nvim) — `lua/plugins/mason.lua`
+**LSP 配置**: [neovim/nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) — `lua/plugins/python.lua`
+**快捷键与搜索**: `lua/config/keymaps.lua` + [nvim-telescope/telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
 
-### C/C++ LSP (clangd)
+### LSP 服务器 (Mason 自动安装)
 
-Neovim 原生 LSP 配置，不依赖 `nvim-lspconfig`：
+| 服务器 | 语言 | 状态 |
+|--------|------|------|
+| `clangd` | C/C++ | Mason 自动安装，供 C/C++ 项目使用 |
+| `pyright` | Python | 已自动启用 (类型检查) |
+| `ruff` | Python | 已自动启用 (lint) |
 
-- **后端**: `clangd-18`
-- **参数**: `--background-index` (后台索引), `--header-insertion=never` (不自动插入头文件)
-- **支持文件类型**: `c`, `cpp`, `h`, `hpp`
-- **根目录识别**: `compile_commands.json` > `compile_flags.txt` > `.git`
+首次启动 Neovim 时 Mason 会自动安装缺失的服务器；也可以手动管理：
 
-> 嵌入式项目中建议生成 `compile_commands.json`（CMake: `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`，或使用 `bear` 工具），这样 clangd 可以正确解析交叉编译的头文件和宏定义。
+| 命令 | 功能 |
+|------|------|
+| `:Mason` | 打开 Mason 管理面板 (安装/卸载/更新服务器) |
 
-### Rust LSP
-
-由 `rustaceanvim` 内置集成 `rust-analyzer`，详见[第 11 节](#11-rust-开发-rustaceanvim--dap)。
+> 嵌入式项目中建议生成 `compile_commands.json`（CMake: `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`，或使用 `bear` 工具），clangd 才能正确解析交叉编译的头文件和宏定义。
 
 ### 核心跳转快捷键
 
@@ -231,17 +242,21 @@ Neovim 原生 LSP 配置，不依赖 `nvim-lspconfig`：
 
 ---
 
-## 7. 代码格式化 (conform.nvim + clang-format)
+## 7. 代码格式化 (conform.nvim)
 
 **插件**: [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)
-**配置文件**: `lua/plugins/c-cpp.lua`
+**配置文件**: `lua/plugins/c-cpp.lua` + `lua/plugins/python.lua`
 
-### C/C++ 保存时自动格式化
+### 保存时自动格式化
+
+| 语言 | 工具 | 说明 |
+|------|------|------|
+| C/C++ | `clang-format` | `--style=file`，读取项目根目录 `.clang-format` 配置 |
+| Python | `ruff_format` | ruff 自带格式化器 |
 
 - **触发时机**: `BufWritePre` (保存前自动执行)
-- **命令**: `clang-format --style=file` (读取项目根目录 `.clang-format` 配置)
 - **超时**: 5000ms
-- **fallback**: 若 `clang-format` 不可用，退回到 LSP 格式化
+- **fallback**: 若格式化器不可用，退回到 LSP 格式化
 
 ### 手动命令
 
@@ -253,7 +268,34 @@ Neovim 原生 LSP 配置，不依赖 `nvim-lspconfig`：
 
 ---
 
-## 8. ARM 嵌入式调试 (DAP + OpenOCD + GDB)
+## 8. Python 开发 (pyright + ruff)
+
+**配置文件**: `lua/plugins/python.lua`
+
+- **pyright**: 类型检查与智能补全
+- **ruff**: 代码 lint + `ruff_format` 保存时格式化
+- 两者均通过 nvim-lspconfig 自动启用，无需手动配置
+
+通用 LSP 快捷键 (跳转/重命名/诊断) 见[第 6 节](#6-lsp-配置与定义跳转-mason--telescope)。
+
+---
+
+## 9. Rust 开发 (Rustaceanvim)
+
+**插件**: [mrcjkb/rustaceanvim](https://github.com/mrcjkb/rustaceanvim)
+**配置文件**: `lua/plugins/rust.lua`
+
+### Rust-analyzer 特性
+
+- **保存时 Clippy 检查**: `checkOnSave.command = "clippy"`，保存后自动运行 lints
+
+> 可用于嵌入式 Rust (如 `no_std` + `cortex-m` 系列 crate) 开发。
+
+通用 LSP 快捷键 (跳转/重命名/诊断) 见[第 6 节](#6-lsp-配置与定义跳转-mason--telescope)。
+
+---
+
+## 10. ARM 嵌入式调试 (DAP + OpenOCD + GDB)
 
 **插件**: [mfussenegger/nvim-dap](https://github.com/mfussenegger/nvim-dap) + [rcarriga/nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) + [theHamsta/nvim-dap-virtual-text](https://github.com/theHamsta/nvim-dap-virtual-text)
 **配置文件**: `lua/plugins/dap-arm.lua`
@@ -345,7 +387,7 @@ uint32_t status = READY;   // → status = 0x0003
 
 ---
 
-## 9. 包围符号 (nvim-surround)
+## 11. 包围符号 (nvim-surround)
 
 **插件**: [kylechui/nvim-surround](https://github.com/kylechui/nvim-surround)
 **配置文件**: `lua/plugins/nvim-surround.lua`
@@ -371,7 +413,7 @@ cst<div>   → <div>hello</div>  (t = tag)
 
 ---
 
-## 10. 语法高亮 (Treesitter)
+## 12. 语法高亮 (Treesitter)
 
 **插件**: [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
 **配置文件**: `lua/plugins/treesitter.lua`
@@ -395,29 +437,48 @@ cst<div>   → <div>hello</div>  (t = tag)
 
 ---
 
-## 11. Rust 开发 (Rustaceanvim + DAP)
+## 13. 彩虹括号 (rainbow-delimiters)
 
-**插件**: [mrcjkb/rustaceanvim](https://github.com/mrcjkb/rustaceanvim) + [mfussenegger/nvim-dap](https://github.com/mfussenegger/nvim-dap)
-**配置文件**: `lua/plugins/rust.lua`
+**插件**: [HiPhish/rainbow-delimiters.nvim](https://github.com/HiPhish/rainbow-delimiters.nvim)
+**配置文件**: `lua/plugins/rainbow.lua`
 
-### Rust 特有快捷键
-
-| 快捷键 | 功能 |
-|--------|------|
-| `K` | Rust 增强 hover (支持 actions) |
-| `<Space>ca` | Rust 代码操作 |
-| `gd` | 原生 LSP 跳转定义 |
-
-### Rust-analyzer 特性
-
-- **保存时 Clippy 检查**: `checkOnSave.command = "clippy"`
-- **内联类型提示**: `inlayHints.enable = true`
-
-> 可用于嵌入式 Rust (如 `no_std` + `cortex-m` 系列 crate) 开发。
+嵌套括号按层级着色，共 7 种颜色循环 (红/黄/蓝/橙/绿/紫/青)，深层次嵌套代码一目了然。Vim 文件使用局部作用域策略，其余语言使用全局策略。
 
 ---
 
-## 12. Markdown 渲染
+## 14. 缩进指示线 (indent-blankline)
+
+**插件**: [lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim)
+**配置文件**: `lua/plugins/indent-blankline.lua`
+
+- 缩进线字符: `┊`
+- 当前作用域高亮: 跨行代码块 (如函数体) 的起始/结束行画 `│` 水平指示线
+- 在 help、neo-tree、mason、toggleterm 等面板中自动禁用
+
+---
+
+## 15. 平滑滚动 (neoscroll)
+
+**插件**: [karb94/neoscroll.nvim](https://github.com/karb94/neoscroll.nvim)
+**配置文件**: `lua/plugins/neoscroll.lua`
+
+### 滚动快捷键
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<C-u>` | 向上平滑翻半页 (光标不动) |
+| `<C-d>` | 向下平滑翻半页 (光标不动) |
+| `<C-b>` | 向上平滑翻整页 (光标不动) |
+| `<C-f>` | 向下平滑翻整页 (光标不动) |
+
+### 特性
+
+- 二次函数缓动曲线 (`quadratic`)，滚动自然流畅
+- 到达文件边界时平滑停止 (`stop_eof: true`)
+
+---
+
+## 16. Markdown 渲染
 
 **插件**: [MeanderingProgrammer/render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim)
 **配置文件**: `lua/plugins/markdown.lua`
@@ -426,7 +487,7 @@ Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等�
 
 ---
 
-## 13. 完整快捷键速查表
+## 17. 完整快捷键速查表
 
 ### 通用
 
@@ -437,6 +498,13 @@ Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等�
 | `<Space>th` | 水平终端 |
 | `<C-c>` (Visual) | 复制到系统剪贴板 |
 | `d` (Normal/Visual) | 删除 (不覆盖剪贴板，黑洞寄存器 `"_d`) |
+
+### 滚动
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<C-u>` / `<C-d>` | 平滑翻半页 |
+| `<C-b>` / `<C-f>` | 平滑翻整页 |
 
 ### 窗口管理
 
@@ -474,16 +542,6 @@ Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等�
 | `<F12>` | 单步跳出 |
 | `<Leader>db` | 切换断点 |
 | `<Leader>dB` | 条件断点 |
-
-### Rust 调试 (DAP)
-
-| 快捷键 | 功能 |
-|--------|------|
-| `<F5>` | 继续执行 |
-| `<F10>` | 单步跳过 |
-| `<F11>` | 单步进入 |
-| `<F12>` | 单步跳出 |
-| `<Leader>db` | 切换断点 |
 
 ### 注释
 
@@ -523,9 +581,14 @@ Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等�
 | nvim-autopairs | https://github.com/windwp/nvim-autopairs |
 | nvim-surround | https://github.com/kylechui/nvim-surround |
 | telescope.nvim | https://github.com/nvim-telescope/telescope.nvim |
+| mason.nvim | https://github.com/williamboman/mason.nvim |
+| nvim-lspconfig | https://github.com/neovim/nvim-lspconfig |
 | nvim-treesitter | https://github.com/nvim-treesitter/nvim-treesitter |
 | conform.nvim | https://github.com/stevearc/conform.nvim |
 | rustaceanvim | https://github.com/mrcjkb/rustaceanvim |
+| rainbow-delimiters.nvim | https://github.com/HiPhish/rainbow-delimiters.nvim |
+| indent-blankline.nvim | https://github.com/lukas-reineke/indent-blankline.nvim |
+| neoscroll.nvim | https://github.com/karb94/neoscroll.nvim |
 | nvim-dap | https://github.com/mfussenegger/nvim-dap |
 | nvim-dap-ui | https://github.com/rcarriga/nvim-dap-ui |
 | nvim-dap-virtual-text | https://github.com/theHamsta/nvim-dap-virtual-text |
