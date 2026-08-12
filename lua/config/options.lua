@@ -6,4 +6,9 @@ vim.opt.clipboard = "unnamedplus"
 vim.keymap.set("v", "<C-c>", '"+y', { noremap = true, silent = true })
 
 -- 强制侧边栏（SignColumn）始终显示，防止标志出现/消失时代码左侧来回抖动
-vim.opt.signcolumn = "yes:2" -- 或者 "yes"
+vim.opt.signcolumn = "yes:1" -- 或者 "yes"
+
+vim.opt.tabstop = 4        -- Tab 宽度为 4
+vim.opt.shiftwidth = 4     -- 自动缩进宽度为 4
+vim.opt.softtabstop = 4    -- 编辑时按 Tab 视作 4 个空格
+vim.opt.expandtab = true   -- 按 Tab 时转换为实际空格
