@@ -1,6 +1,6 @@
-# Neovim 配置操作手册 — `embedded-conf` 分支
+# Neovim 配置操作手册
 
-> **分支定位**: 嵌入式 ARM Cortex-M 开发环境，集成 OpenOCD + GDB 片上调试 (On-Chip Debugging)。
+> **定位**: 嵌入式 ARM Cortex-M 开发环境，集成 OpenOCD + GDB 片上调试、clang-format 自动格式化与原生 LSP。
 > **插件管理器**: [lazy.nvim](https://github.com/folke/lazy.nvim)
 > **Leader 键**: `<Space>`
 
@@ -15,11 +15,12 @@
 5. [自动配对符号 (nvim-autopairs)](#5-自动配对符号-nvim-autopairs)
 6. [LSP 配置与定义跳转](#6-lsp-配置与定义跳转)
 7. [代码格式化 (conform.nvim + clang-format)](#7-代码格式化-conformnvim--clang-format)
-8. [包围符号 (nvim-surround)](#8-包围符号-nvim-surround)
-9. [语法高亮 (Treesitter)](#9-语法高亮-treesitter)
-10. [Rust 开发 (Rustaceanvim + DAP)](#10-rust-开发-rustaceanvim--dap)
-11. [Markdown 渲染](#11-markdown-渲染)
-12. [完整快捷键速查表](#12-完整快捷键速查表)
+8. [ARM 嵌入式调试 (DAP + OpenOCD + GDB)](#8-arm-嵌入式调试-dap--openocd--gdb)
+9. [包围符号 (nvim-surround)](#9-包围符号-nvim-surround)
+10. [语法高亮 (Treesitter)](#10-语法高亮-treesitter)
+11. [Rust 开发 (Rustaceanvim + DAP)](#11-rust-开发-rustaceanvim--dap)
+12. [Markdown 渲染](#12-markdown-渲染)
+13. [完整快捷键速查表](#13-完整快捷键速查表)
 
 ---
 
@@ -79,10 +80,10 @@
 
 ### 特性
 
-- 终端大小固定 (15 行)，关闭时保留上一次大小
-- 终端退出后自动关闭窗口
-- 终端背景带阴影效果 (`shade_terminals: true`)
-- **嵌入式场景**: 可在此终端中运行 `openocd`、`make`、`gdb` 等命令行工具
+- 高度固定 15 行，关闭后记住上次大小
+- 退出 shell 后自动关闭终端窗口
+- 终端背景带阴影效果
+- 可在终端中运行 `openocd`、`make`、`gdb` 等命令行工具
 
 ---
 
@@ -140,8 +141,8 @@
 
 ### 特性
 
-- 注释符号与代码之间自动加空格
-- 注释后光标保持原位置 (`sticky: true`)
+- 注释符号与代码间自动加空格
+- 注释后光标保持原位 (`sticky: true`)
 - 自动识别文件类型，支持 C、汇编 (`.s`/`.S`) 等嵌入式常见语言
 
 ---
@@ -181,15 +182,15 @@
 Neovim 原生 LSP 配置，不依赖 `nvim-lspconfig`：
 
 - **后端**: `clangd-18`
-- **参数**: `--background-index` (后台建索引), `--header-insertion=never` (不自动插头文件)
+- **参数**: `--background-index` (后台索引), `--header-insertion=never` (不自动插入头文件)
 - **支持文件类型**: `c`, `cpp`, `h`, `hpp`
 - **根目录识别**: `compile_commands.json` > `compile_flags.txt` > `.git`
 
-> 用于嵌入式项目时，建议生成 `compile_commands.json`（CMake: `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`，或使用 `bear` 工具），这样 clangd 可以正确解析交叉编译的头文件和宏定义。
+> 嵌入式项目中建议生成 `compile_commands.json`（CMake: `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`，或使用 `bear` 工具），这样 clangd 可以正确解析交叉编译的头文件和宏定义。
 
 ### Rust LSP
 
-由 `rustaceanvim` 内置集成 `rust-analyzer`，详见[第 10 节](#10-rust-开发-rustaceanvim--dap)。
+由 `rustaceanvim` 内置集成 `rust-analyzer`，详见[第 11 节](#11-rust-开发-rustaceanvim--dap)。
 
 ### 核心跳转快捷键
 
@@ -233,7 +234,7 @@ Neovim 原生 LSP 配置，不依赖 `nvim-lspconfig`：
 ## 7. 代码格式化 (conform.nvim + clang-format)
 
 **插件**: [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)
-**配置文件**: `lua/plugins/c-cpp.lua` (symlink → Embedded-nvim)
+**配置文件**: `lua/plugins/c-cpp.lua`
 
 ### C/C++ 保存时自动格式化
 
@@ -248,14 +249,16 @@ Neovim 原生 LSP 配置，不依赖 `nvim-lspconfig`：
 |------|------|
 | `:ConformInfo` | 查看格式化状态和可用 formatter |
 
+> 嵌入式项目中建议配置 `.clang-format` 以匹配团队代码风格。
+
 ---
 
-## 8. ARM 嵌入式调试 (DAP + OpenOCD + GDB) — 与 master 的唯一差异
+## 8. ARM 嵌入式调试 (DAP + OpenOCD + GDB)
 
 **插件**: [mfussenegger/nvim-dap](https://github.com/mfussenegger/nvim-dap) + [rcarriga/nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) + [theHamsta/nvim-dap-virtual-text](https://github.com/theHamsta/nvim-dap-virtual-text)
-**配置文件**: `lua/plugins/dap-arm.lua` (symlink → Embedded-nvim)
+**配置文件**: `lua/plugins/dap-arm.lua`
 
-> 这是 `embedded-conf` 分支与 `master` 的核心区别。此配置实现了在 Neovim 内一键烧录 + 调试 ARM Cortex-M 芯片的完整工作流。
+在 Neovim 内实现一键烧录 + 调试 ARM Cortex-M 芯片的完整工作流。
 
 ### 前置依赖
 
@@ -281,7 +284,7 @@ Neovim 原生 LSP 配置，不依赖 `nvim-lspconfig`：
 
 ### MCU 自动识别
 
-配置根据 ELF 文件名自动推测 MCU 系列：
+根据 ELF 文件名自动推测 MCU 系列：
 
 | 文件名包含 | 识别的 MCU | OpenOCD 配置 |
 |------------|------------|---------------|
@@ -316,17 +319,9 @@ Neovim 原生 LSP 配置，不依赖 `nvim-lspconfig`：
 
 ### DAP 调试面板 (nvim-dap-ui)
 
-调试启动后自动显示：
-
-- **Variables**: 变量查看
-- **Watch**: 监视表达式
-- **Call Stack**: 调用栈
-- **Breakpoints**: 断点列表
-- **Scopes**: 作用域变量
+调试启动后自动显示：**Variables** · **Watch** · **Call Stack** · **Breakpoints** · **Scopes**
 
 ### DAP 调试快捷键
-
-DAP 使用标准的 nvim-dap 快捷键：
 
 | 快捷键 | 功能 |
 |--------|------|
@@ -341,7 +336,7 @@ DAP 使用标准的 nvim-dap 快捷键：
 
 ### 内联变量显示 (nvim-dap-virtual-text)
 
-调试时在代码行尾直接显示变量值，无需查看 Variables 面板：
+调试时在代码行尾直接显示变量值：
 
 ```c
 int counter = 0;           // → counter = 42
@@ -376,7 +371,7 @@ cst<div>   → <div>hello</div>  (t = tag)
 
 ---
 
-## 9. 语法高亮 (Treesitter)
+## 10. 语法高亮 (Treesitter)
 
 **插件**: [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
 **配置文件**: `lua/plugins/treesitter.lua`
@@ -400,7 +395,7 @@ cst<div>   → <div>hello</div>  (t = tag)
 
 ---
 
-## 10. Rust 开发 (Rustaceanvim + DAP)
+## 11. Rust 开发 (Rustaceanvim + DAP)
 
 **插件**: [mrcjkb/rustaceanvim](https://github.com/mrcjkb/rustaceanvim) + [mfussenegger/nvim-dap](https://github.com/mfussenegger/nvim-dap)
 **配置文件**: `lua/plugins/rust.lua`
@@ -422,7 +417,7 @@ cst<div>   → <div>hello</div>  (t = tag)
 
 ---
 
-## 11. Markdown 渲染
+## 12. Markdown 渲染
 
 **插件**: [MeanderingProgrammer/render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim)
 **配置文件**: `lua/plugins/markdown.lua`
@@ -431,7 +426,7 @@ Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等�
 
 ---
 
-## 12. 完整快捷键速查表
+## 13. 完整快捷键速查表
 
 ### 通用
 
@@ -466,6 +461,19 @@ Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等�
 | `<Space>xx` | 项目诊断列表 |
 | `<Space>rn` | 重命名 |
 | `<Space>ca` | 代码操作 |
+
+### ARM 调试
+
+| 快捷键 | 功能 |
+|--------|------|
+| `<Space>dd` | ARM Flash & Debug (一键烧录+调试) |
+| `:ArmDebug` | 手动触发 ARM 调试 |
+| `<F5>` | 继续执行 |
+| `<F10>` | 单步跳过 |
+| `<F11>` | 单步进入 |
+| `<F12>` | 单步跳出 |
+| `<Leader>db` | 切换断点 |
+| `<Leader>dB` | 条件断点 |
 
 ### Rust 调试 (DAP)
 
@@ -516,25 +524,10 @@ Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等�
 | nvim-surround | https://github.com/kylechui/nvim-surround |
 | telescope.nvim | https://github.com/nvim-telescope/telescope.nvim |
 | nvim-treesitter | https://github.com/nvim-treesitter/nvim-treesitter |
+| conform.nvim | https://github.com/stevearc/conform.nvim |
 | rustaceanvim | https://github.com/mrcjkb/rustaceanvim |
 | nvim-dap | https://github.com/mfussenegger/nvim-dap |
 | nvim-dap-ui | https://github.com/rcarriga/nvim-dap-ui |
 | nvim-dap-virtual-text | https://github.com/theHamsta/nvim-dap-virtual-text |
 | render-markdown.nvim | https://github.com/MeanderingProgrammer/render-markdown.nvim |
 | vscode.nvim (主题) | https://github.com/Mofiqul/vscode.nvim |
-
----
-
-## embedded-conf 分支特点总结
-
-- **C/C++ 代码格式化**: `conform.nvim` + `clang-format` 保存时自动格式化
-- **LSP**: Neovim 原生 LSP (`clangd-18`)，无需 `nvim-lspconfig`
-- **调试**: Rust DAP (nvim-dap + nvim-dap-ui)
-- **通用开发**: 适合日常 C/C++/Rust 项目开发，侧重代码整洁度
-- **clang-format**: 保存时自动格式化 C/C++ 代码 (conform.nvim)
-- **ARM Cortex-M 片上调试**: DAP + OpenOCD + arm-none-eabi-gdb 全集成（与 `master` 的唯一差异）
-- **一键烧录+调试**: `<Space>dd` 自动打开 OpenOCD、连接 GDB、烧录 ELF、启动 DAP UI
-- **内联变量显示**: 调试时直接在代码行尾显示变量数值
-- **自动 MCU 识别**: 根据 ELF 文件名自动匹配 stm32f1/f4/h7 的 OpenOCD 配置
-- **LSP**: Neovim 原生 LSP (`clangd-18`)，适合嵌入式 C 项目的 `compile_commands.json` 工作流
-- **适合场景**: STM32 裸机/RTOS 开发，ARM Cortex-M 系列 MCU
