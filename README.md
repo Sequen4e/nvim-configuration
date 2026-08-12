@@ -1,6 +1,6 @@
 # Neovim 配置操作手册
 
-> 面向嵌入式 ARM Cortex-M 与多语言 (C/C++ · Rust · Python) 开发，集成片上调试、自动格式化与原生 LSP。
+> 多语言 (C/C++ · Rust · Python) 开发，集成嵌入式片上调试、自动格式化与原生 LSP。
 > **插件管理器**: [lazy.nvim](https://github.com/folke/lazy.nvim)
 > **Leader 键**: `<Space>`
 
