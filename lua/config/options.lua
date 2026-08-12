@@ -1,7 +1,20 @@
--- 1. 将 Neovim 的无名寄存器 (*) 与系统剪贴板 (+) 关联
+-- vim.opt.number = true
+vim.opt.relativenumber = true
+
+-- Let Treesitter handle highlighting, not LSP semantic tokens
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if client then
+      client.server_capabilities.semanticTokensProvider = nil
+    end
+  end,
+})
+
+-- 将 Neovim 的无名寄存器 (*) 与系统剪贴板 (+) 关联
 vim.opt.clipboard = "unnamedplus"
 
--- 2. （可选）为 Visual 模式映射额外的快捷键
+--（可选）为 Visual 模式映射额外的快捷键
 -- 习惯按 y 复制时，自动同步到系统剪贴板；也可以映射 Ctrl+C 直接复制
 vim.keymap.set("v", "<C-c>", '"+y', { noremap = true, silent = true })
 
