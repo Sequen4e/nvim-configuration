@@ -7,7 +7,7 @@ return {
     -- 1. 初始化 neoscroll 引擎
     neoscroll.setup({
       mappings = {}, -- 彻底禁用默认的 Ctrl 键位映射
-      hide_cursor = true, -- 滚动时隐藏光标
+      hide_cursor = false,
       stop_eof = true, -- 边界平滑停止
       respect_scrolloff = false,
       cursor_scrolls_alone = true,
@@ -16,16 +16,16 @@ return {
 
     -- 2. 预定义平滑滚动 API (使用 neoscroll 最新 API 签名)
     local function scroll_half_down()
-      neoscroll.scroll(0.5, { move_cursor = true, duration = 200 })
+      neoscroll.scroll(0.5, { move_cursor = false, duration = 200 })
     end
     local function scroll_half_up()
-      neoscroll.scroll(-0.5, { move_cursor = true, duration = 200 })
+      neoscroll.scroll(-0.5, { move_cursor = false, duration = 200 })
     end
     local function scroll_down()
-      neoscroll.ctrl_f({ duration = 250 })
+      neoscroll.ctrl_f({ duration = 250, cursor = false })
     end
     local function scroll_up()
-      neoscroll.ctrl_b({ duration = 250 })
+      neoscroll.ctrl_b({ duration = 250, cursor = false })
     end
 
     -- 3. 按键映射预留区
