@@ -19,7 +19,9 @@ vim.opt.rtp:prepend(lazypath)
 -- loading lazy.nvim so that mappings are correct.
 -- This is also a good place to setup other settings (vim.opt)
 vim.g.mapleader = " "
-vim.g.maplocalleader = "\\"
+-- 原为 "\\"：与 LaTeX 命令冲突，VimTeX 的 localleader 映射需要无歧义前缀，改为 ","
+-- （当前配置无任何插件使用 localleader，此修改对代码编辑零影响）
+vim.g.maplocalleader = ","
 
 -- Setup lazy.nvim
 require("lazy").setup({

@@ -10,7 +10,7 @@ return {
     end
 
     configs.setup({
-      ensure_installed = { "rust", "lua", "vim", "vimdoc", "python", "c", "cpp", "bash", "markdown" },
+      ensure_installed = { "rust", "lua", "vim", "vimdoc", "python", "c", "cpp", "bash", "markdown", "markdown_inline", "latex", "bibtex" },
       highlight = {
         enable = true,
         additional_vim_regex_highlighting = false,

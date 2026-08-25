@@ -1,6 +1,6 @@
 # Neovim 配置操作手册
 
-> 多语言 (C/C++ · Rust · Python) 开发，集成嵌入式片上调试、自动格式化与原生 LSP。
+> 多语言 (C/C++ · Rust · Python) 开发，集成嵌入式片上调试、自动格式化与原生 LSP；同时支持 Markdown / LaTeX / 纯文本写作。
 > **插件管理器**: [lazy.nvim](https://github.com/folke/lazy.nvim)
 > **Leader 键**: `<Space>`
 
@@ -24,7 +24,9 @@
 14. [缩进指示线 (indent-blankline)](#14-缩进指示线-indent-blankline)
 15. [平滑滚动 (neoscroll)](#15-平滑滚动-neoscroll)
 16. [Markdown 渲染](#16-markdown-渲染)
-17. [完整快捷键速查表](#17-完整快捷键速查表)
+17. [纯文本编辑](#17-纯文本编辑)
+18. [LaTeX (VimTeX)](#18-latex-vimtex)
+19. [完整快捷键速查表](#19-完整快捷键速查表)
 
 ---
 
@@ -481,13 +483,74 @@ cst<div>   → <div>hello</div>  (t = tag)
 ## 16. Markdown 渲染
 
 **插件**: [MeanderingProgrammer/render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim)
-**配置文件**: `lua/plugins/markdown.lua`
+**配置文件**: `lua/plugins/markdown.lua` + `after/ftplugin/markdown.lua`
 
 Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等，所见即所得。
 
+- Treesitter 额外安装 `markdown_inline` parser，支持行内元素渲染
+- 打开 Markdown 文件自动启用拼写检查与软换行 (`spell` + `wrap` + `linebreak`)
+- 缩进指示线在 Markdown 中自动禁用，保持排版干净
+
 ---
 
-## 17. 完整快捷键速查表
+## 17. 纯文本编辑
+
+**配置文件**: `after/ftplugin/text.lua`
+
+打开 `.txt` 等纯文本文件时自动启用：
+
+| 设置 | 说明 |
+|------|------|
+| `spell` | 拼写检查 (默认语言 `en`，可按需修改 `spelllang`) |
+| `wrap` + `linebreak` | 长行软换行，仅在单词边界断行 |
+| `breakindent` | 换行部分与行首缩进对齐 |
+
+缩进指示线在纯文本中自动禁用。
+
+---
+
+## 18. LaTeX (VimTeX)
+
+**插件**: [lervag/vimtex](https://github.com/lervag/vimtex)
+**配置文件**: `lua/plugins/latex.lua` + `after/ftplugin/tex.lua`
+
+完整的 LaTeX 编辑-编译-查看闭环。
+
+### 前置依赖
+
+| 工具 | 用途 | 安装 |
+|------|------|------|
+| `texlive` | LaTeX 发行版 (提供 latexmk) | `apt install texlive-latex-extra` |
+| `zathura` | PDF 阅读器，支持 synctex 正反向搜索 | `apt install zathura zathura-pdf-poppler` |
+
+> 未安装 zathura 时 VimTeX 自动回退到其他可用阅读器。
+
+### 工作流
+
+| 快捷键 | 功能 |
+|--------|------|
+| `,ll` | 编译 (latexmk 自动处理多遍编译) |
+| `,lv` | 打开/跳转 PDF (正向搜索，光标位置同步到阅读器) |
+| `,lt` | 文档大纲 (TOC) |
+| `,le` | 错误列表 |
+| `,lk` | 停止编译 |
+| `,lc` | 清理辅助文件 |
+| `,lq` | 编译日志 |
+| `,lx` | 重新加载插件 |
+
+反向搜索 (PDF → 源码) 由 VimTeX 自动配置，zathura 中 `Ctrl+鼠标左键` 跳回源码。
+
+### 特性
+
+- **localleader 已从 `\` 改为 `,`** (`lua/config/lazy.lua`)，避免与 LaTeX 命令冲突
+- 拼写检查与软换行自动启用 (`after/ftplugin/tex.lua`)
+- `conceallevel` 由 VimTeX 自动管理 (行内数学公式渲染)
+- Treesitter 安装 `latex` 与 `bibtex` parser，语法高亮完整覆盖正文与参考文献
+- 现有 `nvim-surround` 可直接用于 `\textbf{...}` 等命令包裹
+
+---
+
+## 19. 完整快捷键速查表
 
 ### 通用
 
@@ -543,6 +606,17 @@ Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等�
 | `<Leader>db` | 切换断点 |
 | `<Leader>dB` | 条件断点 |
 
+### LaTeX (localleader `,`)
+
+| 快捷键 | 功能 |
+|--------|------|
+| `,ll` | 编译 (latexmk) |
+| `,lv` | 打开/跳转 PDF (正向搜索) |
+| `,lt` | 文档大纲 |
+| `,le` | 错误列表 |
+| `,lk` | 停止编译 |
+| `,lc` | 清理辅助文件 |
+
 ### 注释
 
 | 快捷键 | 功能 |
@@ -593,4 +667,5 @@ Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等�
 | nvim-dap-ui | https://github.com/rcarriga/nvim-dap-ui |
 | nvim-dap-virtual-text | https://github.com/theHamsta/nvim-dap-virtual-text |
 | render-markdown.nvim | https://github.com/MeanderingProgrammer/render-markdown.nvim |
+| vimtex | https://github.com/lervag/vimtex |
 | vscode.nvim (主题) | https://github.com/Mofiqul/vscode.nvim |

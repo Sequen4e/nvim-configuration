@@ -34,6 +34,10 @@ return {
         "notify",
         "toggleterm",
         "lazyterm",
+        -- 写作类文件：缩进线是代码语义的产物，在纯文本/Markdown/LaTeX 中属于噪音
+        "text",
+        "markdown",
+        "tex",
       },
     },
   },
