@@ -2,6 +2,11 @@
 -- Neovim 0.12.0 + Telescope + LSP 最佳绑定配置
 -- =====================================================================
 
+-- 宏录制重绑定：q 让位给清除搜索高亮，录制改由 <leader>q 触发
+-- 注意 noremap：rhs 的 "q" 必须直通内建命令，否则会递归触发上面的 noh 映射
+vim.keymap.set("n", "q", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
+vim.keymap.set("n", "<leader>q", "q", { noremap = true, desc = "Record macro" })
+
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', { clear = true }),
   callback = function(ev)
