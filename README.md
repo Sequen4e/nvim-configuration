@@ -186,7 +186,7 @@
 ## 6. LSP 配置与定义跳转 (Mason + Telescope)
 
 **LSP 服务器管理**: [williamboman/mason.nvim](https://github.com/williamboman/mason.nvim) — `lua/plugins/mason.lua`
-**LSP 配置**: [neovim/nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) — `lua/plugins/python.lua`
+**LSP 配置**: [neovim/nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) — `lua/plugins/lsp.lua`
 **快捷键与搜索**: `lua/config/keymaps.lua` + [nvim-telescope/telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
 
 ### LSP 服务器 (Mason 自动安装)
@@ -247,7 +247,7 @@
 ## 7. 代码格式化 (conform.nvim)
 
 **插件**: [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)
-**配置文件**: `lua/plugins/c-cpp.lua` + `lua/plugins/python.lua`
+**配置文件**: `lua/plugins/lsp.lua`
 
 ### 保存时自动格式化
 
@@ -272,7 +272,7 @@
 
 ## 8. Python 开发 (pyright + ruff)
 
-**配置文件**: `lua/plugins/python.lua`
+**配置文件**: `lua/plugins/lsp.lua`
 
 - **pyright**: 类型检查与智能补全
 - **ruff**: 代码 lint + `ruff_format` 保存时格式化
