@@ -1,12 +1,12 @@
--- telescope 0.1.x 调用 make_position_params 时未传 position_encoding
--- （nvim 0.11+ 会在跨文件跳转时告警）；统一补默认 utf-16（LSP 标准编码，
--- clangd/pyright/rust-analyzer 均默认 utf-16），消除告警且行为不变
-local lsp_util = require("vim.lsp.util")
-local orig_make_position_params = lsp_util.make_position_params
-lsp_util.make_position_params = function(win, encoding)
-  return orig_make_position_params(win, encoding or "utf-16")
-end
-
+-- ============================================================
+-- 添加新语言的框架约定（三步）：
+--   1. mason.lua 的 ensure_installed 里加入对应 LSP 二进制
+--   2. 下方 config 里 vim.lsp.config["<server>"] = { cmd = { mason 绝对路径, ... } }
+--      + vim.lsp.enable("<server>")
+--   3. (可选) conform 的 formatters_by_ft 加格式化器
+-- 铁律：同一插件的 spec 不得拆分到多个文件（lazy 只执行一个 config），
+-- 所有 LSP/conform 配置必须集中在本文件
+-- ============================================================
 return {
   {
     "neovim/nvim-lspconfig",
