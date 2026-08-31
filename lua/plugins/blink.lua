@@ -9,11 +9,11 @@ return {
         function()
           vim.g.blink_cmp_enabled = not (vim.g.blink_cmp_enabled ~= false)
           vim.notify(
-            "自动补全: " .. (vim.g.blink_cmp_enabled and "ON" or "OFF"),
+            "Auto Completion:" .. (vim.g.blink_cmp_enabled and "ON" or "OFF"),
             vim.log.levels.INFO
           )
         end,
-        desc = "Toggle completion (补全开关)",
+        desc = "Toggle completion",
       },
     },
     opts = {
