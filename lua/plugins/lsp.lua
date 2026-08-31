@@ -16,7 +16,15 @@ return {
       -- 另外 mason 是 cmd 懒加载，其 bin 目录不会注入 PATH，cmd 必须写绝对路径
 
       vim.lsp.config["clangd"] = {
-        cmd = { vim.fn.stdpath("data") .. "/mason/bin/clangd", "--background-index", "--header-insertion=never" },
+        -- --query-driver：让 clangd 向项目实际使用的编译器查询内置 include 路径，
+        -- 而非依赖自己的 gcc 版本探测（本机 gcc-14 缺 libstdc++-14-dev 时探测会选错版本，
+        -- 导致 'iostream' file not found）
+        cmd = {
+          vim.fn.stdpath("data") .. "/mason/bin/clangd",
+          "--background-index",
+          "--header-insertion=never",
+          "--query-driver=/usr/bin/*",
+        },
         filetypes = { "c", "cpp", "h", "hpp" },
       }
       vim.lsp.enable("clangd")

@@ -7,6 +7,11 @@
 vim.keymap.set("n", "q", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
 vim.keymap.set("n", "<leader>q", "q", { noremap = true, desc = "Record macro" })
 
+-- S 替代 cc：将当前 buffer 中所有搜索高亮的文本替换为接下来输入的内容
+-- 用法：/foo<CR> 高亮全部匹配 → S → 输入 bar/g<CR>（全量）或 bar/gc<CR>（逐个确认）
+-- （:%s 的 pattern 留空 = 复用上次搜索，即当前高亮内容）
+vim.keymap.set("n", "S", ":%s//", { noremap = true, desc = "Replace search matches" })
+
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', { clear = true }),
   callback = function(ev)
