@@ -12,6 +12,24 @@ vim.keymap.set("n", "<leader>q", "q", { noremap = true, desc = "Record macro" })
 -- （:%s 的 pattern 留空 = 复用上次搜索，即当前高亮内容）
 vim.keymap.set("n", "S", ":%s//", { noremap = true, desc = "Replace search matches" })
 
+-- 可视模式 p 重映射：原生覆盖粘贴（位置永远正确），事后恢复被覆盖的寄存器
+-- 效果：viwp 替换当前词且保持寄存器 = 多目标连续替换只需反复 viwp
+vim.keymap.set("x", "p", function()
+  local regs = { '"', "+" } -- 默认寄存器与剪贴板（clipboard=unnamedplus 会同步）
+  local used = vim.v.register
+  if used ~= "" and not vim.tbl_contains(regs, used) then
+    table.insert(regs, used)
+  end
+  local saved = {}
+  for _, r in ipairs(regs) do
+    saved[r] = { vim.fn.getreg(r), vim.fn.getregtype(r) }
+  end
+  vim.cmd("normal! p")
+  for _, r in ipairs(regs) do
+    vim.fn.setreg(r, saved[r][1], saved[r][2])
+  end
+end, { desc = "Paste over selection (preserve register)" })
+
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', { clear = true }),
   callback = function(ev)
@@ -74,7 +92,5 @@ vim.api.nvim_create_autocmd('LspAttach', {
     opts.desc = "LSP: [C]ode [A]ction"
     vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
 
-    -- forbbid "d" override clip board
-    vim.keymap.set({ "n", "v" }, "d", '"_d', { noremap = true })
   end,
 })
