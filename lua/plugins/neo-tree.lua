@@ -8,7 +8,7 @@ return {
   },
   config = function()
     require("neo-tree").setup({
-      close_if_last_window = true,
+      close_if_last_window = false,
 
       -- 1. 窗口样式与全局按键映射（直接写在 window 下）
       window = {
