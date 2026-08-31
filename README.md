@@ -27,6 +27,7 @@
 17. [纯文本编辑](#17-纯文本编辑)
 18. [LaTeX (VimTeX)](#18-latex-vimtex)
 19. [完整快捷键速查表](#19-完整快捷键速查表)
+20. [代码补全与 Claude Code](#20-代码补全与-claude-code)
 
 ---
 
@@ -564,6 +565,8 @@ Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等�
 | `q` | 清除搜索高亮 (`:nohlsearch`) |
 | `<Space>q` | 录制宏 (原 `q`，后接寄存器名，如 `<Space>qa` 录制到寄存器 a) |
 | `S` | 替换全部搜索高亮 (进入 `:%s//`，输入 `新内容/g` 回车全量替换，`/gc` 逐个确认) |
+| `<Space>tc` | 开/关自动补全 |
+| `<Space>ac` | 开/关 Claude Code 终端 |
 
 ### 滚动
 
@@ -646,6 +649,42 @@ Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等�
 
 ---
 
+## 20. 代码补全与 Claude Code
+
+### 代码补全 (blink.cmp)
+
+**插件**: [Saghen/blink.cmp](https://github.com/saghen/blink.cmp) (v1 稳定线，Rust 匹配器)
+**配置文件**: `lua/plugins/blink.lua`
+
+- 输入时自动弹出 LSP 补全 (clangd / pyright / ruff / rust-analyzer) + 路径 + buffer 词
+- `Tab` 接受/下一项 · `S-Tab` 上一项 · `Enter` 接受选中 · `Ctrl+n/p` 上下选择
+- **开关**: `<Space>tc` 随时开/关补全 (全局开关，下次触发即生效)
+
+### Claude Code (claude-code.nvim)
+
+**插件**: [greggh/claude-code.nvim](https://github.com/coder/claudecode.nvim)
+**配置文件**: `lua/plugins/claude.lua`
+
+| 快捷键/命令 | 功能 |
+|------|------|
+| `<Space>ac` | 开/关 Claude Code 终端 (项目根目录启动) |
+| `<Space>aC` | 续接最近会话 (resume) |
+| `:ClaudeCodeVerbose` | 详细模式 |
+
+Claude Code 修改文件后 nvim 自动重载。
+
+**Agent 统计命令** (在 Claude Code 终端内输入):
+
+| 命令 | 信息 |
+|------|------|
+| `/status` | 当前模型、配置、会话状态 |
+| `/cost` | 本次会话 token 用量与费用 |
+| `/usage` | token 用量明细 |
+| `/context` | 上下文窗口占用 |
+| `/memory` | 记忆文件管理 |
+
+---
+
 ## 插件链接汇总
 
 | 插件 | 文档 |
@@ -671,4 +710,6 @@ Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等�
 | nvim-dap-virtual-text | https://github.com/theHamsta/nvim-dap-virtual-text |
 | render-markdown.nvim | https://github.com/MeanderingProgrammer/render-markdown.nvim |
 | vimtex | https://github.com/lervag/vimtex |
+| blink.cmp | https://github.com/saghen/blink.cmp |
+| claude-code.nvim | https://github.com/coder/claudecode.nvim |
 | vscode.nvim (主题) | https://github.com/Mofiqul/vscode.nvim |
