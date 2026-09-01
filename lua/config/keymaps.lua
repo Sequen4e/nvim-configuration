@@ -1,21 +1,18 @@
 -- =====================================================================
--- Neovim 0.12.0 + Telescope + LSP 最佳绑定配置
+-- Neovim 0.12.*
 -- =====================================================================
 
--- 宏录制重绑定：q 让位给清除搜索高亮，录制改由 <leader>q 触发
--- 注意 noremap：rhs 的 "q" 必须直通内建命令，否则会递归触发上面的 noh 映射
+-- q -> :noh
+-- <leader>q -> macro recording
 vim.keymap.set("n", "q", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
 vim.keymap.set("n", "<leader>q", "q", { noremap = true, desc = "Record macro" })
 
--- S 替代 cc：将当前 buffer 中所有搜索高亮的文本替换为接下来输入的内容
--- 用法：/foo<CR> 高亮全部匹配 → S → 输入 bar/g<CR>（全量）或 bar/gc<CR>（逐个确认）
--- （:%s 的 pattern 留空 = 复用上次搜索，即当前高亮内容）
+-- S: replacement
 vim.keymap.set("n", "S", ":%s//", { noremap = true, desc = "Replace search matches" })
 
--- 可视模式 p 重映射：原生覆盖粘贴（位置永远正确），事后恢复被覆盖的寄存器
--- 效果：viwp 替换当前词且保持寄存器 = 多目标连续替换只需反复 viwp
+-- partial replacements
 vim.keymap.set("x", "p", function()
-  local regs = { '"', "+" } -- 默认寄存器与剪贴板（clipboard=unnamedplus 会同步）
+  local regs = { '"', "+" }
   local used = vim.v.register
   if used ~= "" and not vim.tbl_contains(regs, used) then
     table.insert(regs, used)
@@ -30,6 +27,15 @@ vim.keymap.set("x", "p", function()
   end
 end, { desc = "Paste over selection (preserve register)" })
 
+-- line start, end navigation
+-- H / L first/last valid char jump
+vim.keymap.set({'n', 'v'}, 'H', '^',  { noremap = true, silent = true, desc = "Go to line start (non-whitespace)" })
+vim.keymap.set({'n', 'v'}, 'L', 'g_', { noremap = true, silent = true, desc = "Go to line end (non-whitespace)" })
+-- _ / g_ screen top/bottom jump
+vim.keymap.set({'n', 'v'}, '_',  'H', { noremap = true, silent = true, desc = "Move to top of screen" })
+vim.keymap.set({'n', 'v'}, 'g_', 'L', { noremap = true, silent = true, desc = "Move to bottom of screen" })
+
+-- LSP-based servic config
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('UserLspConfig', { clear = true }),
   callback = function(ev)
