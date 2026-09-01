@@ -28,6 +28,7 @@
 18. [LaTeX (VimTeX)](#18-latex-vimtex)
 19. [完整快捷键速查表](#19-完整快捷键速查表)
 20. [代码补全与 Claude Code](#20-代码补全与-claude-code)
+21. [Flash 快速跳转](#21-flash-快速跳转)
 
 ---
 
@@ -561,10 +562,15 @@ Markdown 文件内实时渲染粗体、斜体、标题、链接、代码块等�
 | `<C-t>` | 切换终端 |
 | `<Space>th` | 水平终端 |
 | `<C-c>` (Visual) | 复制到系统剪贴板 |
-| `viwp` | 替换当前词 (可视 `p` 已重映射为保留寄存器，多目标连续替换安全) |
+| `viwp` / `p` (Visual) | 粘贴覆盖 (可视 `p` 已重映射为不覆盖寄存器，多目标连续替换安全) |
 | `q` | 清除搜索高亮 (`:nohlsearch`) |
 | `<Space>q` | 录制宏 (原 `q`，后接寄存器名，如 `<Space>qa` 录制到寄存器 a) |
-| `S` | 替换全部搜索高亮 (进入 `:%s//`，输入 `新内容/g` 回车全量替换，`/gc` 逐个确认) |
+| `gS` | 替换全部搜索高亮 (进入 `:%s//`，输入 `新内容/g` 回车全量替换，`/gc` 逐个确认) |
+| `H` / `L` | 行首/行尾第一个非空白字符 |
+| `_` / `g_` | 屏幕顶部/底部 |
+| `<C-a>` | 全选 |
+| `U` | 重做 |
+| `s` | Flash 快速跳转 (Normal/Visual/Operator-pending) |
 | `<Space>tc` | 开/关自动补全 |
 | `<Space>ac` | 开/关 Claude Code 终端 |
 
@@ -685,6 +691,23 @@ Claude Code 修改文件后 nvim 自动重载。
 
 ---
 
+## 21. Flash 快速跳转
+
+**插件**: [folke/flash.nvim](https://github.com/folke/flash.nvim)
+**配置文件**: `lua/plugins/flash.lua`
+
+| 快捷键 | 功能 |
+|--------|------|
+| `s` | 全屏标签跳转 (Normal / Visual / Operator-pending，运算符后按 `s` 即跳转作运动) |
+| `f` / `F` / `t` / `T` | 原生逐字符导航 (char 模式已关闭) |
+| `/` | 原生搜索 (search 模式已关闭) |
+
+- 高亮使用 vscode dark 调色板 (金色标签 / 橙色目标 / 灰色遮罩)，无默认绿色
+- 与 nvim-surround 共存：`ys`/`ds`/`cs` 是 normal 多键映射，Vim 优先解析，互不干扰；visual `S` 归属 surround
+- 在 Neo-tree 窗口同样可用
+
+---
+
 ## 插件链接汇总
 
 | 插件 | 文档 |
@@ -712,4 +735,5 @@ Claude Code 修改文件后 nvim 自动重载。
 | vimtex | https://github.com/lervag/vimtex |
 | blink.cmp | https://github.com/saghen/blink.cmp |
 | claude-code.nvim | https://github.com/coder/claudecode.nvim |
+| flash.nvim | https://github.com/folke/flash.nvim |
 | vscode.nvim (主题) | https://github.com/Mofiqul/vscode.nvim |
