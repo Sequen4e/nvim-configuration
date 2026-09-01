@@ -1,7 +1,7 @@
 return {
   {
     "Saghen/blink.cmp",
-    version = "1.*", -- v1 稳定线（v2 破坏性变更中；官方建议 pin）
+    version = "1.*", -- 2026/8: v2 is destructive refactoring, pin version to v1
     event = "InsertEnter",
     keys = {
       {
@@ -17,11 +17,11 @@ return {
       },
     },
     opts = {
-      -- 补全总开关：每次触发时求值，<leader>tc 翻转 vim.g.blink_cmp_enabled 即生效
+      -- master switch
       enabled = function()
         return vim.g.blink_cmp_enabled ~= false
       end,
-      -- Tab = 接受/下一项，S-Tab = 上一项，Enter = 接受选中
+      -- Tab = accept/next item, S-Tab = last item, Enter = accept selecting item
       keymap = { preset = "super-tab" },
       sources = {
         default = { "lsp", "path", "buffer" },

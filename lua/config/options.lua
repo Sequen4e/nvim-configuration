@@ -11,15 +11,16 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
--- 将 Neovim 的无名寄存器 (*) 与系统剪贴板 (+) 关联
+-- connect unamed register (*) and system clipboard (+)
 vim.opt.clipboard = "unnamedplus"
-
---（可选）为 Visual 模式映射额外的快捷键
--- 习惯按 y 复制时，自动同步到系统剪贴板；也可以映射 Ctrl+C 直接复制
+-- visual mode copy to system clipboard
 vim.keymap.set("v", "<C-c>", '"+y', { noremap = true, silent = true })
 
--- 强制侧边栏（SignColumn）始终显示，防止标志出现/消失时代码左侧来回抖动
+-- signcolumn constant persist.
 vim.opt.signcolumn = "yes:1" -- 或者 "yes"
+
+-- recogonize a sentence end with only 1 space
+vim.opt.cpoptions:remove("J")
 
 vim.opt.tabstop = 4        -- Tab 宽度为 4
 vim.opt.shiftwidth = 4     -- 自动缩进宽度为 4

@@ -8,24 +8,10 @@ vim.keymap.set("n", "q", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight
 vim.keymap.set("n", "<leader>q", "q", { noremap = true, desc = "Record macro" })
 
 -- S: replacement
-vim.keymap.set("n", "S", ":%s//", { noremap = true, desc = "Replace search matches" })
+vim.keymap.set("n", "gS", ":%s//", { noremap = true, desc = "Replace search matches" })
 
 -- partial replacements
-vim.keymap.set("x", "p", function()
-  local regs = { '"', "+" }
-  local used = vim.v.register
-  if used ~= "" and not vim.tbl_contains(regs, used) then
-    table.insert(regs, used)
-  end
-  local saved = {}
-  for _, r in ipairs(regs) do
-    saved[r] = { vim.fn.getreg(r), vim.fn.getregtype(r) }
-  end
-  vim.cmd("normal! p")
-  for _, r in ipairs(regs) do
-    vim.fn.setreg(r, saved[r][1], saved[r][2])
-  end
-end, { desc = "Paste over selection (preserve register)" })
+vim.keymap.set("x", "p", '"_dP', { desc = "Paste without overwriting register" })
 
 -- line start, end navigation
 -- H / L first/last valid char jump
@@ -34,6 +20,12 @@ vim.keymap.set({'n', 'v'}, 'L', 'g_', { noremap = true, silent = true, desc = "G
 -- _ / g_ screen top/bottom jump
 vim.keymap.set({'n', 'v'}, '_',  'H', { noremap = true, silent = true, desc = "Move to top of screen" })
 vim.keymap.set({'n', 'v'}, 'g_', 'L', { noremap = true, silent = true, desc = "Move to bottom of screen" })
+
+-- select all
+vim.keymap.set('n', '<C-a>', 'ggVG', { desc = "Select all" })
+
+-- undo
+vim.keymap.set('n', 'U', '<C-r>', { desc = "Redo" })
 
 -- LSP-based servic config
 vim.api.nvim_create_autocmd('LspAttach', {

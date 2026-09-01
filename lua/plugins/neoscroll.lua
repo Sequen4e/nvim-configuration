@@ -4,9 +4,9 @@ return {
   config = function()
     local neoscroll = require("neoscroll")
 
-    -- 1. 初始化 neoscroll 引擎
+    -- initializing neoscroll engin
     neoscroll.setup({
-      mappings = {}, -- 彻底禁用默认的 Ctrl 键位映射
+      mappings = {}, -- disable default key mappings
       hide_cursor = false,
       stop_eof = true, -- 边界平滑停止
       respect_scrolloff = false,
@@ -14,7 +14,7 @@ return {
       easing = "quadratic", -- 物理平滑缓动
     })
 
-    -- 2. 预定义平滑滚动 API (使用 neoscroll 最新 API 签名)
+    -- pre-defined smooth scroll
     local function scroll_half_down()
       neoscroll.scroll(0.5, { move_cursor = false, duration = 200 })
     end
@@ -28,26 +28,13 @@ return {
       neoscroll.ctrl_b({ duration = 250, cursor = false })
     end
 
-    -- 3. 按键映射预留区
+    -- key mappings
     local keymap = vim.keymap.set
     local opts = { noremap = true, silent = true }
-
     -- [default]
-    keymap("n", "<C-u>", scroll_half_up,   vim.tbl_extend("force", opts, { desc = "向上平滑翻半页" }))
-    keymap("n", "<C-d>", scroll_half_down, vim.tbl_extend("force", opts, { desc = "向下平滑翻半页" }))
-    keymap("n", "<C-f>", scroll_down,   vim.tbl_extend("force", opts, { desc = "向下平滑翻页" }))
-    keymap("n", "<C-b>", scroll_up, vim.tbl_extend("force", opts, { desc = "向上平滑翻页" }))
-
-    -- 【方案 A】：方括号 [ (上翻) 与 ] (下翻)
-    -- keymap("n", "]", scroll_half_down, vim.tbl_extend("force", opts, { desc = "向下平滑翻半页" }))
-    -- keymap("n", "[", scroll_half_up,   vim.tbl_extend("force", opts, { desc = "向上平滑翻半页" }))
-
-    -- 【方案 B】：大写 H (上翻) 与 L (下翻)
-    -- keymap("n", "L", scroll_half_down, vim.tbl_extend("force", opts, { desc = "向下平滑翻半页" }))
-    -- keymap("n", "H", scroll_half_up,   vim.tbl_extend("force", opts, { desc = "向上平滑翻半页" }))
-
-    -- 【方案 C】：Leader 组合键 <leader>j / <leader>k
-    -- keymap("n", "<leader>j", scroll_half_down, vim.tbl_extend("force", opts, { desc = "向下平滑翻半页" }))
-    -- keymap("n", "<leader>k", scroll_half_up,   vim.tbl_extend("force", opts, { desc = "向上平滑翻半页" }))
+    keymap("n", "<C-u>", scroll_half_up,   vim.tbl_extend("force", opts, { desc = "up scroll half page" }))
+    keymap("n", "<C-d>", scroll_half_down, vim.tbl_extend("force", opts, { desc = "down scroll half page" }))
+    keymap("n", "<C-f>", scroll_down,   vim.tbl_extend("force", opts, { desc = "up scroll page" }))
+    keymap("n", "<C-b>", scroll_up, vim.tbl_extend("force", opts, { desc = "down scroll page" }))
   end,
 }
