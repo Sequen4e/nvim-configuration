@@ -78,8 +78,8 @@ Leader is <kbd>Space</kbd> (shown as `␣`), localleader is `,` (LaTeX).
 
 | Key | Action |
 |-----|--------|
-| `q` | Clear search highlight |
-| `Q` | Clear search highlight + neutralize the search register (`n`/`N` become inert until the next search) |
+| `Q` | Clear search highlight |
+| `q` | Toggle preview mode — read-only pager, see [Preview Mode](#preview-mode) |
 | `␣q` | Record macro (original `q`, followed by a register name) |
 | `M` | Replay the last recorded macro |
 | `R` | Replace all search matches — prompts `:%s//`, type `new/g⏎` (all) or `new/gc⏎` (confirm each) |
@@ -108,6 +108,18 @@ Leader is <kbd>Space</kbd> (shown as `␣`), localleader is `,` (LaTeX).
 | `␣w{hjkl}` | Swap window positions |
 | `␣e` | Toggle file tree |
 | `<C-t>` / `␣th` | Toggle terminal / horizontal terminal |
+
+### Preview Mode (`q` toggle, `Esc` exit)
+
+| Key | Action |
+|-----|--------|
+| `j` / `k` / `e` / `y` | Scroll one line |
+| `d` / `u` | Scroll half page (smooth) |
+| `f` / `b` | Scroll full page (smooth) |
+| `h` / `l` | Scroll horizontally |
+| `Esc` / `q` | Exit preview |
+
+Absolute line numbers and read-only (edits raise E21). Scroll mappings are mounted only while the mode is active — outside preview every key keeps its native meaning (`d` = delete, `u` = undo, `y` = yank).
 
 ### File Tree (neo-tree)
 
