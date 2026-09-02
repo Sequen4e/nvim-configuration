@@ -3,15 +3,17 @@
 -- =====================================================================
 
 -- q -> :noh
--- <leader>q -> macro recording
-vim.keymap.set("n", "q", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
-vim.keymap.set("n", "<leader>q", "q", { noremap = true, desc = "Record macro" })
+-- <leader>q -> record macro
+vim.keymap.set({'n', 'v'}, "q", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
+vim.keymap.set({'n', 'v'}, "<leader>q", "q", { noremap = true, desc = "Record macro" })
 
--- S: replacement
-vim.keymap.set("n", "S", ":%s//", { noremap = true, desc = "Replace search matches" })
+-- M -> play macro
+vim.keymap.set('n', 'M', '@', { noremap = true, desc = 'Play macro' })
 
+-- R -> replacement
+vim.keymap.set('n', 'R', ":%s//", { noremap = true, desc = "Replace search matches" })
 -- partial replacements
-vim.keymap.set("x", "p", '"_dP', { desc = "Paste without overwriting register" })
+vim.keymap.set('x', 'p', '"_dP', { desc = "Paste without overwriting register" })
 
 -- line start, end navigation
 -- H / L first/last valid char jump
@@ -24,8 +26,14 @@ vim.keymap.set({'n', 'v'}, 'g_', 'L', { noremap = true, silent = true, desc = "M
 -- select all
 vim.keymap.set('n', '<C-a>', 'ggVG', { desc = "Select all" })
 
+-- save
+vim.keymap.set('n', '<C-s>', ':w<CR>', { desc = "Save current file" })
+
 -- undo
 vim.keymap.set('n', 'U', '<C-r>', { desc = "Redo" })
+
+-- diagnostics auto fix
+vim.keymap.set('n', 'S', vim.lsp.buf.code_action, { desc = "LSP Code Action" })
 
 -- LSP-based servic config
 vim.api.nvim_create_autocmd('LspAttach', {

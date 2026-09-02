@@ -79,8 +79,11 @@ Leader is <kbd>Space</kbd> (shown as `␣`), localleader is `,` (LaTeX).
 | Key | Action |
 |-----|--------|
 | `q` | Clear search highlight |
+| `Q` | Clear search highlight + neutralize the search register (`n`/`N` become inert until the next search) |
 | `␣q` | Record macro (original `q`, followed by a register name) |
-| `gS` | Replace all search matches — prompts `:%s//`, type `new/g⏎` (all) or `new/gc⏎` (confirm each) |
+| `M` | Replay the last recorded macro |
+| `R` | Replace all search matches — prompts `:%s//`, type `new/g⏎` (all) or `new/gc⏎` (confirm each) |
+| `S` | LSP code action (diagnostics auto-fix) |
 | `viwp` / visual `p` | Paste over a word — visual `p` is remapped to preserve the register, so repeated `viwp` replaces multiple targets with the same yank |
 | `H` / `L` | Jump to first / last non-blank character of the line |
 | `_` / `g_` | Jump to top / bottom of the screen |
