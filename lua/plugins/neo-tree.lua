@@ -11,7 +11,7 @@ return {
             close_if_last_window = false,
             window = {
                 position = "left",
-                width = 25,
+                width = 20,
                 mappings = {
                     -- jump
                     -- ["]"] = "next_sibling",     -- 跳转到同层级的下一个文件/文件夹
