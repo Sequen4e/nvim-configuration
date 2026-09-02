@@ -16,8 +16,9 @@ vim.opt.clipboard = "unnamedplus"
 -- visual mode copy to system clipboard
 vim.keymap.set("v", "<C-c>", '"+y', { noremap = true, silent = true })
 
--- signcolumn constant persist.
-vim.opt.signcolumn = "yes:1" -- 或者 "yes"
+-- signcolumn constant persist
+-- coexist on the same col: git marks (col 1), diagnostics (col 2)
+vim.opt.signcolumn = "yes:2"
 
 -- recogonize a sentence end with only 1 space
 vim.opt.cpoptions:remove("J")

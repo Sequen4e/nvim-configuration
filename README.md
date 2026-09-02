@@ -279,7 +279,7 @@ Three steps, one rule:
 - **Indent guides**: `┊` with scope highlighting; disabled in prose files
 - **Rainbow delimiters** for nested brackets
 - **Flash highlights** follow the theme palette (gold labels, orange targets, gray backdrop)
-- **Gitsigns** uses subtle bar glyphs in the sign column
+- **Gitsigns** uses subtle bar glyphs in the sign column; two sign columns — git marks in column 1, diagnostics in column 2 (one sign per line, worst severity only)
 
 ---
 

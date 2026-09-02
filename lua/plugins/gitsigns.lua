@@ -2,6 +2,8 @@ return {
     "lewis6991/gitsigns.nvim",
     event = { "BufReadPre", "BufNewFile" },
     opts = {
+        -- higher priority than diagnostic info
+        sign_priority = 20,
         -- sign style
         signs = {
             add = { text = "▎" },
