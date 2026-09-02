@@ -8,7 +8,7 @@ vim.keymap.set("n", "q", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight
 vim.keymap.set("n", "<leader>q", "q", { noremap = true, desc = "Record macro" })
 
 -- S: replacement
-vim.keymap.set("n", "gS", ":%s//", { noremap = true, desc = "Replace search matches" })
+vim.keymap.set("n", "S", ":%s//", { noremap = true, desc = "Replace search matches" })
 
 -- partial replacements
 vim.keymap.set("x", "p", '"_dP', { desc = "Paste without overwriting register" })
