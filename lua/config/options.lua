@@ -1,4 +1,5 @@
--- vim.opt.number = true
+-- hybrid linenumber
+vim.opt.number = true
 vim.opt.relativenumber = true
 
 -- Let Treesitter handle highlighting, not LSP semantic tokens
