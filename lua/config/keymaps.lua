@@ -35,5 +35,13 @@ vim.keymap.set('n', 'U', '<C-r>', { desc = "Redo" })
 -- diagnostics auto fix
 vim.keymap.set('n', 'S', vim.lsp.buf.code_action, { desc = "LSP Code Action" })
 
+-- Embedded feature switch: when OFF, <leader>dd / :ArmDebug refuse to run.
+-- Pure-software debugging (codelldb/debugpy via F5 etc.) is unaffected.
+vim.g.embedded_enabled = true
+vim.keymap.set('n', '<leader>td', function()
+    vim.g.embedded_enabled = not vim.g.embedded_enabled
+    vim.notify('Embedded: ' .. (vim.g.embedded_enabled and 'ENABLED' or 'DISABLED'), vim.log.levels.INFO)
+end, { desc = 'Toggle embedded features' })
+
 -- Preview mode lives in lua/config/preview.lua
 -- LSP keymaps live in lua/config/lsp.lua

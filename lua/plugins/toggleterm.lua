@@ -3,6 +3,7 @@ return {
     version = "*",
     keys = {
         { "<leader>th", "<cmd>ToggleTerm<CR>", desc = "Toggle Terminal" },
+        { "<C-i>", "<cmd>ToggleTerm<CR>", desc = "Toggle Terminal" },
     },
     config = function()
         require("toggleterm").setup({

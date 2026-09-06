@@ -3,7 +3,7 @@ return {
     "williamboman/mason.nvim",
     cmd = "Mason",
     opts = {
-      ensure_installed = { "clangd", "pyright", "ruff" },
+      ensure_installed = { "clangd", "pyright", "ruff", "codelldb", "debugpy" },
     },
     config = function(_, opts)
       require("mason").setup(opts)

@@ -107,7 +107,7 @@ Leader 为 <kbd>空格</kbd>(下文记为 `␣`),localleader 为 `,`(LaTeX 用)�
 | `<A-h/j/k/l>` | 调整窗口大小 |
 | `␣w{hjkl}` | 窗口位置对调 |
 | `␣e` | 开关文件树 |
-| `<C-t>` / `␣th` | 开关终端 / 水平终端 |
+| `<C-i>` / `␣th` | 开关终端 / 水平终端 |
 
 ### 预览模式(`q` 开关,`Esc` 退出)
 
@@ -150,11 +150,18 @@ Leader 为 <kbd>空格</kbd>(下文记为 `␣`),localleader 为 `,`(LaTeX 用)�
 | `,lt` / `,le` | 文档大纲 / 错误列表 |
 | `,lk` / `,lc` / `,lq` / `,lx` | 停止 / 清理 / 日志 / 重载 |
 
-### ARM 调试
+### 调试 (DAP)
 
 | 按键 | 功能 |
 |------|------|
-| `␣dd` / `:ArmDebug` | 一键烧录 + 调试(OpenOCD + GDB + DAP UI) |
+| `␣db` / `␣dB` | 切换 / 条件断点 |
+| `<F5>` / `<F10>` / `<F11>` / `<F12>` | 继续 / 单步跳过 / 单步进入 / 单步跳出 |
+| `␣dr` | DAP REPL |
+| `␣dl` / `␣dt` | 运行到光标 / 终止 |
+| `␣dd` / `:ArmDebug` | 一键 ARM 烧录 + 调试(OpenOCD + GDB + DAP UI) |
+| `␣td` | 开关嵌入式功能(关 ⇒ `␣dd`/`:ArmDebug` 拒绝执行;纯软件调试不受影响) |
+
+调试会话自动打开 DAP UI 面板(变量 · 作用域 · 调用栈 · 断点);virtual text 行内显示变量值。适配器:codelldb(C/C++/Rust)、debugpy(Python)、arm_gdb(嵌入式)。
 
 ### Git (gitsigns)
 

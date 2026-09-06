@@ -107,7 +107,7 @@ Leader is <kbd>Space</kbd> (shown as `␣`), localleader is `,` (LaTeX).
 | `<A-h/j/k/l>` | Resize windows |
 | `␣w{hjkl}` | Swap window positions |
 | `␣e` | Toggle file tree |
-| `<C-t>` / `␣th` | Toggle terminal / horizontal terminal |
+| `<C-i>` / `␣th` | Toggle terminal / horizontal terminal |
 
 ### Preview Mode (`q` toggle, `Esc` exit)
 
@@ -150,11 +150,18 @@ Absolute line numbers and read-only (edits raise E21). Scroll mappings are mount
 | `,lt` / `,le` | Table of contents / errors |
 | `,lk` / `,lc` / `,lq` / `,lx` | Stop / clean / log / reload |
 
-### ARM Debug
+### Debugging (DAP)
 
 | Key | Action |
 |-----|--------|
-| `␣dd` / `:ArmDebug` | One-key flash & debug (OpenOCD + GDB + DAP UI) |
+| `␣db` / `␣dB` | Toggle / conditional breakpoint |
+| `<F5>` / `<F10>` / `<F11>` / `<F12>` | Continue / step over / step into / step out |
+| `␣dr` | DAP REPL |
+| `␣dl` / `␣dt` | Run to cursor / terminate |
+| `␣dd` / `:ArmDebug` | One-key ARM flash & debug (OpenOCD + GDB + DAP UI) |
+| `␣td` | Toggle embedded features (off ⇒ `␣dd`/`:ArmDebug` refuse; software debugging unaffected) |
+
+Debug sessions open the DAP UI panel (variables · scopes · call stack · breakpoints) automatically; virtual text shows variable values inline. Adapters: codelldb (C/C++/Rust), debugpy (Python), arm_gdb (embedded).
 
 ### Git (gitsigns)
 
