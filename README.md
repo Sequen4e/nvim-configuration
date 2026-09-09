@@ -78,12 +78,11 @@ Leader is <kbd>Space</kbd> (shown as `␣`), localleader is `,` (LaTeX).
 
 | Key | Action |
 |-----|--------|
-| `Q` | Clear search highlight |
-| `q` | Toggle preview mode — read-only pager, see [Preview Mode](#preview-mode) |
-| `␣q` | Record macro (original `q`, followed by a register name) |
-| `M` | Replay the last recorded macro |
+| `q` | Enter preview mode — read-only pager, see [Preview Mode](#preview-mode) |
+| `Q` | Record macro (original `q`, followed by a register name) |
+| `Z` | Clear search highlight |
 | `R` | Replace all search matches — prompts `:%s//`, type `new/g⏎` (all) or `new/gc⏎` (confirm each) |
-| `S` | LSP code action (diagnostics auto-fix) |
+| `S` | Prefix for Refactor / Git / Diagnostics chords — see [S-Prefix Chords](#s-prefix-chords) |
 | `viwp` / visual `p` | Paste over a word — visual `p` is remapped to preserve the register, so repeated `viwp` replaces multiple targets with the same yank |
 | `H` / `L` | Jump to first / last non-blank character of the line |
 | `_` / `g_` | Jump to top / bottom of the screen |
@@ -109,7 +108,7 @@ Leader is <kbd>Space</kbd> (shown as `␣`), localleader is `,` (LaTeX).
 | `␣e` | Toggle file tree |
 | `<C-i>` / `␣th` | Toggle terminal / horizontal terminal |
 
-### Preview Mode (`q` toggle, `Esc` exit)
+### Preview Mode (`q` enter, `Esc` exit)
 
 | Key | Action |
 |-----|--------|
@@ -117,9 +116,21 @@ Leader is <kbd>Space</kbd> (shown as `␣`), localleader is `,` (LaTeX).
 | `d` / `u` | Scroll half page (smooth) |
 | `f` / `b` | Scroll full page (smooth) |
 | `h` / `l` | Scroll horizontally |
-| `Esc` / `q` | Exit preview |
+| `Esc` | Exit preview |
 
-Absolute line numbers and read-only (edits raise E21). Scroll mappings are mounted only while the mode is active — outside preview every key keeps its native meaning (`d` = delete, `u` = undo, `y` = yank).
+Absolute line numbers and read-only (edits raise E21). Scroll mappings are mounted only while the mode is active — outside preview every key keeps its native meaning (`d` = delete, `u` = undo, `y` = yank). Preview also auto-exits when leaving the buffer (switching to neo-tree, terminal, or another file).
+
+### S-Prefix Chords (Refactor / Git / Diagnostics)
+
+| Key | Action |
+|-----|--------|
+| `Sr` / `Sf` | LSP rename / format buffer |
+| `Sa` | LSP code action |
+| `Shs` / `Shr` | Git stage / reset hunk |
+| `Shb` / `Shp` | Git blame line / preview hunk |
+| `Shd` | Git diff entire buffer vs index |
+| `Scq` | Send diagnostics to quickfix |
+| `Sn` / `SN` | Next / previous diagnostic |
 
 ### File Tree (neo-tree)
 
@@ -186,15 +197,19 @@ Debug sessions open the DAP UI panel (variables · scopes · call stack · break
 
 ```
 ~/.config/nvim
-├── init.lua                     # entry: lazy → keymaps → options
+├── init.lua                     # entry: lazy → keymaps → options → diagnostics → preview → lsp
+├── PERFORMANCE.md               # performance assessment report
 ├── lua/
 │   ├── config/
 │   │   ├── lazy.lua             # lazy.nvim bootstrap, leader keys
-│   │   ├── keymaps.lua          # global + LSP keymaps
-│   │   └── options.lua          # editor options, autocmds
+│   │   ├── keymaps.lua          # global keymaps + S-prefix chords + embedded switch
+│   │   ├── options.lua          # editor options, autocmds
+│   │   ├── diagnostics.lua      # one-sign-per-line (worst severity) handler
+│   │   ├── preview.lua          # preview mode (read-only pager)
+│   │   └── lsp.lua              # LSP keymaps (telescope + floats)
 │   └── plugins/                 # one spec file per domain
 │       ├── lsp.lua              # ALL LSP configs + conform formatters (single file by design)
-│       ├── dap-arm.lua          # embedded debug stack (lazy)
+│       ├── dap.lua              # DAP: generic debugging + ARM flash & debug (lazy)
 │       ├── latex.lua · markdown.lua · blink.lua · claude.lua · flash.lua · gitsigns.lua
 │       └── …                    # UI / editing plugins
 └── after/ftplugin/              # per-filetype settings
@@ -223,11 +238,11 @@ Debug sessions open the DAP UI panel (variables · scopes · call stack · break
 | [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) | LSP setup (clangd / pyright / ruff) | `lsp.lua` |
 | [conform.nvim](https://github.com/stevearc/conform.nvim) | Format on save | `lsp.lua` |
 | [rustaceanvim](https://github.com/mrcjkb/rustaceanvim) | Rust LSP + clippy on save | `rust.lua` |
-| [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) | Highlighting & indentation (12 parsers) | `treesitter.lua` |
+| [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) (main) | Parser installs (12 parsers); highlighting via nvim core | `treesitter.lua` |
 | [rainbow-delimiters.nvim](https://github.com/HiPhish/rainbow-delimiters.nvim) | Rainbow brackets | `rainbow.lua` |
 | [indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim) | Indent guides | `indent-blankline.lua` |
 | [neoscroll.nvim](https://github.com/karb94/neoscroll.nvim) | Smooth scrolling | `neoscroll.lua` |
-| [nvim-dap](https://github.com/mfussenegger/nvim-dap) + [dap-ui](https://github.com/rcarriga/nvim-dap-ui) + [virtual-text](https://github.com/theHamsta/nvim-dap-virtual-text) | ARM flash & debug | `dap-arm.lua` |
+| [nvim-dap](https://github.com/mfussenegger/nvim-dap) + [dap-ui](https://github.com/rcarriga/nvim-dap-ui) + [virtual-text](https://github.com/theHamsta/nvim-dap-virtual-text) | Debugging: codelldb / debugpy / ARM flash & debug | `dap.lua` |
 | [render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim) | Live Markdown rendering | `markdown.lua` |
 | [vimtex](https://github.com/lervag/vimtex) (v2.18) | LaTeX compile / view / Synctex | `latex.lua` |
 | [blink.cmp](https://github.com/saghen/blink.cmp) (v1) | Completion (LSP / path / buffer) | `blink.lua` |

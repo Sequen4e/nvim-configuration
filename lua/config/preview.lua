@@ -41,7 +41,7 @@ local function set_preview(on)
     end
     vim.notify(on and '-- PREVIEW --' or '-- PREVIEW OFF --', vim.log.levels.INFO)
 end
-vim.keymap.set('n', 'q', function() set_preview(not vim.g.preview_mode) end, { desc = 'Toggle preview mode' })
+vim.keymap.set('n', 'q', function() set_preview(true) end, { desc = 'Enter preview mode' })
 
 -- Leaving the preview buffer auto-exits (e.g. switching to neo-tree/terminal):
 -- preview is bound to "the file I'm reading" — buffer-local mappings elsewhere

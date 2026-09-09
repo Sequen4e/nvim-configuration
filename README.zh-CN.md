@@ -78,12 +78,11 @@ Leader 为 <kbd>空格</kbd>(下文记为 `␣`),localleader 为 `,`(LaTeX 用)�
 
 | 按键 | 功能 |
 |------|------|
-| `Q` | 清除搜索高亮 |
-| `q` | 开关预览模式——只读浏览,见[预览模式](#预览模式) |
-| `␣q` | 录制宏(原 `q`,后接寄存器名) |
-| `M` | 重放最近录制的宏 |
+| `q` | 进入预览模式——只读浏览,见[预览模式](#预览模式) |
+| `Q` | 录制宏(原 `q`,后接寄存器名) |
+| `Z` | 清除搜索高亮 |
 | `R` | 替换全部搜索高亮——进入 `:%s//`,输入 `新内容/g⏎` 全量,`新内容/gc⏎` 逐个确认 |
-| `S` | LSP 代码操作(诊断自动修复) |
+| `S` | 重构 / Git / 诊断 和弦前缀——见[S 前缀和弦](#s-前缀和弦) |
 | `viwp` / 可视 `p` | 粘贴覆盖当前词——可视 `p` 已重映射为保留寄存器,反复 `viwp` 可用同一内容连续替换多个目标 |
 | `H` / `L` | 跳到行首/行尾第一个非空白字符 |
 | `_` / `g_` | 跳到屏幕顶部/底部 |
@@ -109,7 +108,7 @@ Leader 为 <kbd>空格</kbd>(下文记为 `␣`),localleader 为 `,`(LaTeX 用)�
 | `␣e` | 开关文件树 |
 | `<C-i>` / `␣th` | 开关终端 / 水平终端 |
 
-### 预览模式(`q` 开关,`Esc` 退出)
+### 预览模式(`q` 进入,`Esc` 退出)
 
 | 按键 | 功能 |
 |------|------|
@@ -117,9 +116,21 @@ Leader 为 <kbd>空格</kbd>(下文记为 `␣`),localleader 为 `,`(LaTeX 用)�
 | `d` / `u` | 滚动半页(平滑) |
 | `f` / `b` | 滚动整页(平滑) |
 | `h` / `l` | 横向滚动 |
-| `Esc` / `q` | 退出预览 |
+| `Esc` | 退出预览 |
 
-绝对行号 + 只读(编辑报 E21)。滚动映射仅在模式激活时挂载——退出后所有按键恢复原生含义(`d` = 删除、`u` = 撤销、`y` = 复制)。
+绝对行号 + 只读(编辑报 E21)。滚动映射仅在模式激活时挂载——退出后所有按键恢复原生含义(`d` = 删除、`u` = 撤销、`y` = 复制)。离开预览文件(切到 neo-tree、终端或其他文件)时自动退出。
+
+### S 前缀和弦(重构 / Git / 诊断)
+
+| 按键 | 功能 |
+|------|------|
+| `Sr` / `Sf` | LSP 重命名 / 格式化 buffer |
+| `Sa` | LSP 代码操作 |
+| `Shs` / `Shr` | Git 暂存 / 回退当前 hunk |
+| `Shb` / `Shp` | Git 行级 blame / 预览 hunk |
+| `Shd` | Git 整文件 diff 审查 |
+| `Scq` | 诊断送入 quickfix |
+| `Sn` / `SN` | 下一个 / 上一个诊断 |
 
 ### 文件树 (neo-tree)
 
@@ -186,15 +197,19 @@ Leader 为 <kbd>空格</kbd>(下文记为 `␣`),localleader 为 `,`(LaTeX 用)�
 
 ```
 ~/.config/nvim
-├── init.lua                     # 入口:lazy → keymaps → options
+├── init.lua                     # 入口:lazy → keymaps → options → diagnostics → preview → lsp
+├── PERFORMANCE.md               # 性能评估报告
 ├── lua/
 │   ├── config/
 │   │   ├── lazy.lua             # lazy.nvim 引导、leader 键
-│   │   ├── keymaps.lua          # 全局与 LSP 键位
-│   │   └── options.lua          # 编辑器选项与自动命令
+│   │   ├── keymaps.lua          # 全局键位 + S 前缀和弦 + 嵌入式开关
+│   │   ├── options.lua          # 编辑器选项与自动命令
+│   │   ├── diagnostics.lua      # 每行单符号(最严重级别)handler
+│   │   ├── preview.lua          # 预览模式(只读翻阅)
+│   │   └── lsp.lua              # LSP 键位(telescope + 浮窗)
 │   └── plugins/                 # 每个领域一个 spec 文件
 │       ├── lsp.lua              # 全部 LSP 配置 + conform 格式化器(刻意集中于此)
-│       ├── dap-arm.lua          # 嵌入式调试栈(懒加载)
+│       ├── dap.lua              # DAP:通用调试 + ARM 烧录调试(懒加载)
 │       ├── latex.lua · markdown.lua · blink.lua · claude.lua · flash.lua · gitsigns.lua
 │       └── …                    # UI 与编辑类插件
 └── after/ftplugin/              # 按文件类型的设置
@@ -223,11 +238,11 @@ Leader 为 <kbd>空格</kbd>(下文记为 `␣`),localleader 为 `,`(LaTeX 用)�
 | [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) | LSP 配置(clangd / pyright / ruff) | `lsp.lua` |
 | [conform.nvim](https://github.com/stevearc/conform.nvim) | 保存时格式化 | `lsp.lua` |
 | [rustaceanvim](https://github.com/mrcjkb/rustaceanvim) | Rust LSP + 保存时 clippy | `rust.lua` |
-| [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) | 语法高亮与缩进(12 种 parser) | `treesitter.lua` |
+| [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) (main) | 安装 parser(12 种);高亮由 nvim 核心提供 | `treesitter.lua` |
 | [rainbow-delimiters.nvim](https://github.com/HiPhish/rainbow-delimiters.nvim) | 彩虹括号 | `rainbow.lua` |
 | [indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim) | 缩进指示线 | `indent-blankline.lua` |
 | [neoscroll.nvim](https://github.com/karb94/neoscroll.nvim) | 平滑滚动 | `neoscroll.lua` |
-| [nvim-dap](https://github.com/mfussenegger/nvim-dap) + [dap-ui](https://github.com/rcarriga/nvim-dap-ui) + [virtual-text](https://github.com/theHamsta/nvim-dap-virtual-text) | ARM 烧录与调试 | `dap-arm.lua` |
+| [nvim-dap](https://github.com/mfussenegger/nvim-dap) + [dap-ui](https://github.com/rcarriga/nvim-dap-ui) + [virtual-text](https://github.com/theHamsta/nvim-dap-virtual-text) | 调试:codelldb / debugpy / ARM 烧录调试 | `dap.lua` |
 | [render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim) | Markdown 实时渲染 | `markdown.lua` |
 | [vimtex](https://github.com/lervag/vimtex)(v2.18) | LaTeX 编译 / 查看 / Synctex | `latex.lua` |
 | [blink.cmp](https://github.com/saghen/blink.cmp)(v1) | 补全(LSP / 路径 / buffer 词) | `blink.lua` |

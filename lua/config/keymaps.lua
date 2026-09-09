@@ -2,13 +2,12 @@
 -- Neovim 0.12.*
 -- =====================================================================
 
--- q -> :noh
--- <leader>q -> record macro
-vim.keymap.set({'n', 'v'}, "Q", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
-vim.keymap.set({'n', 'v'}, "<leader>q", "q", { noremap = true, desc = "Record macro" })
+-- q -> preview mode (detailed in preview.lua)
+-- Q -> record macro
+vim.keymap.set({'n', 'v'}, "Q", "q", { noremap = true, desc = "Record macro" })
 
--- M -> play macro
-vim.keymap.set('n', 'M', '@', { noremap = true, desc = 'Play macro' })
+-- Z -> :noh
+vim.keymap.set({'n', 'v'}, "Z", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
 
 -- R -> replacement
 vim.keymap.set('n', 'R', ":%s//", { noremap = true, desc = "Replace search matches" })
@@ -26,14 +25,26 @@ vim.keymap.set({'n', 'v'}, 'g_', 'L', { noremap = true, silent = true, desc = "M
 -- select all
 vim.keymap.set('n', '<C-a>', 'ggVG', { desc = "Select all" })
 
--- save
-vim.keymap.set('n', '<C-s>', ':w<CR>', { desc = "Save current file" })
-
 -- undo
 vim.keymap.set('n', 'U', '<C-r>', { desc = "Redo" })
 
--- diagnostics auto fix
-vim.keymap.set('n', 'S', vim.lsp.buf.code_action, { desc = "LSP Code Action" })
+-- S: Refactor, Git & Diagnostics
+-- unset S
+vim.keymap.set('n', 'S', '<Nop>', { silent = true })
+-- Refactor (S)
+vim.keymap.set('n', 'Sr', function() vim.lsp.buf.rename() end, { desc = "LSP: Rename symbol" })
+vim.keymap.set('n', 'Sf', function() vim.lsp.buf.format({ async = true }) end, { desc = "LSP: Format buffer" })
+vim.keymap.set('n', 'Sa', function() vim.lsp.buf.code_action() end, { desc = "LSP: Code action" })
+-- Git (Sh)
+vim.keymap.set('n', 'Shs', '<cmd>Gitsigns stage_hunk<CR>', { desc = "Git: Stage hunk" })
+vim.keymap.set('n', 'Shr', '<cmd>Gitsigns reset_hunk<CR>', { desc = "Git: Reset hunk" })
+vim.keymap.set('n', 'Shb', '<cmd>Gitsigns blame_line<CR>', { desc = "Git: Blame line" })
+vim.keymap.set('n', 'Shp', '<cmd>Gitsigns preview_hunk<CR>', { desc = "Git: Preview hunk" })
+vim.keymap.set('n', 'Shd', '<cmd>Gitsigns diffthis<CR>', { desc = "Git: Diff this" })
+-- Diagnostic (Sc)
+vim.keymap.set('n', 'Scq', function() vim.diagnostic.setloclist() end, { desc = "LSP: Quickfix diagnostics" })
+vim.keymap.set('n', 'Sn', function() vim.diagnostic.goto_next() end, { desc = "LSP: Next diagnostic" })
+vim.keymap.set('n', 'SN', function() vim.diagnostic.goto_prev() end, { desc = "LSP: Prev diagnostic" })
 
 -- Embedded feature switch: when OFF, <leader>dd / :ArmDebug refuse to run.
 -- Pure-software debugging (codelldb/debugpy via F5 etc.) is unaffected.
