@@ -1,7 +1,10 @@
 -- =====================================================================
--- Neovim 0.12.*
+-- Neovim 0.12.* + 
 -- =====================================================================
 
+
+--------------- Vanilla ---------------
+---
 -- q -> preview mode (detailed in preview.lua)
 -- Q -> record macro
 vim.keymap.set({'n', 'v'}, "Q", "q", { noremap = true, desc = "Record macro" })
@@ -28,6 +31,11 @@ vim.keymap.set('n', '<C-a>', 'ggVG', { desc = "Select all" })
 -- undo
 vim.keymap.set('n', 'U', '<C-r>', { desc = "Redo" })
 
+--------------- Vanilla ---------------
+
+
+--------------- Plugins based ---------------
+
 -- S: Refactor, Git & Diagnostics
 -- unset S
 vim.keymap.set('n', 'S', '<Nop>', { silent = true })
@@ -46,6 +54,9 @@ vim.keymap.set('n', 'Scq', function() vim.diagnostic.setloclist() end, { desc = 
 vim.keymap.set('n', 'Sn', function() vim.diagnostic.goto_next() end, { desc = "LSP: Next diagnostic" })
 vim.keymap.set('n', 'SN', function() vim.diagnostic.goto_prev() end, { desc = "LSP: Prev diagnostic" })
 
+-- toggle markdown rendering
+vim.keymap.set({'n', 'v'}, '<leader>mt', '<cmd>RenderMarkdown toggle<CR>', { desc = "Toggle markdown rendering" })
+
 -- Embedded feature switch: when OFF, <leader>dd / :ArmDebug refuse to run.
 -- Pure-software debugging (codelldb/debugpy via F5 etc.) is unaffected.
 vim.g.embedded_enabled = true
@@ -56,3 +67,5 @@ end, { desc = 'Toggle embedded features' })
 
 -- Preview mode lives in lua/config/preview.lua
 -- LSP keymaps live in lua/config/lsp.lua
+
+--------------- Plugins based ---------------
