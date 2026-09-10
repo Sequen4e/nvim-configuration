@@ -36,6 +36,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
     opts.desc = "LSP: Workspace Diagnostics via Telescope"
     vim.keymap.set('n', '<leader>xx', telescope.diagnostics, opts)
 
+    opts.desc = "LSP: Send [C]urrent line-diagnostics to [Q]uick fix"
+    vim.keymap.set('n', '<leader>cq', function() vim.diagnostic.setloclist() end,  opts)
+
     -------------------------------------------------------------------
     -- 3. Lightweight native floats
     -------------------------------------------------------------------
@@ -45,6 +48,12 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
     opts.desc = "LSP: Show [G]o to [L]ine diagnostics"
     vim.keymap.set('n', 'gl', vim.diagnostic.open_float, opts)
+
+    opts.desc = "LSP: Next diagnostic"
+    vim.keymap.set('n', '<leader>>', function() vim.diagnostic.goto_next() end, opts)
+
+    opts.desc = "LSP: Prev diagnostic"
+    vim.keymap.set('n', '<leader><', function() vim.diagnostic.goto_prev() end, opts)
 
     opts.desc = "LSP: [R]e[n]ame symbol"
     vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)

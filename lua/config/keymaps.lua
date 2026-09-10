@@ -31,28 +31,58 @@ vim.keymap.set('n', '<C-a>', 'ggVG', { desc = "Select all" })
 -- undo
 vim.keymap.set('n', 'U', '<C-r>', { desc = "Redo" })
 
+-- `<->' checkout mark
+vim.keymap.set({'n', 'v'}, "`", "'", { noremap = true, silent = true, desc = "Checkout mark with only row" })
+vim.keymap.set({'n', 'v'}, "'", "`", { noremap = true, silent = true, desc = "Checkout mark with both row and col" })
+
+-- S chord: quick insert
+-- unset S
+vim.keymap.set('n', 'S', '<Nop>', { silent = true })
+-- insert pure empty line
+vim.keymap.set('n', 'SJ', function()
+    local count = vim.v.count1
+    local row = vim.api.nvim_win_get_cursor(0)[1]
+    local empty_lines = {}
+    for _ = 1, count do
+        table.insert(empty_lines, "")
+    end
+    vim.api.nvim_buf_set_lines(0, row, row, false, empty_lines)
+end, { silent = true, desc = "Insert blank line above" })
+vim.keymap.set('n', 'SK', function()
+    local count = vim.v.count1
+    local row = vim.api.nvim_win_get_cursor(0)[1]
+    local empty_lines = {}
+    for _ = 1, count do
+        table.insert(empty_lines, "")
+    end
+    vim.api.nvim_buf_set_lines(0, row - 1, row - 1, false, empty_lines)
+end, { silent = true, desc = "Insert blank line below" })
+-- break line "\[n]"
+vim.keymap.set('n', 'SS', function()
+    local pos = vim.api.nvim_win_get_cursor(0)
+    local row, col = pos[1], pos[2]
+    local line = vim.api.nvim_get_current_line()
+    local char_under_cursor = line:sub(col + 1, col + 1)
+    if char_under_cursor == " " or char_under_cursor == "\t" then
+        vim.cmd('normal! r\r')
+    else
+        vim.cmd('normal! i\r')
+    end
+    vim.cmd('normal! k$')
+end, { noremap = true, silent = true, desc = "Smart split line replacing space/tab with newline" })
+vim.keymap.set('n', "SN", "a<CR><esc>k$", { noremap = true, silent = true, desc = "Break line after cursor" })
+-- insert [Sp]ace
+-- vim.keymap.set('n', "Sp", "i <esc>l", { noremap = true, silent = true, desc = "Insert space before cursor" })
+-- vim.keymap.set('n', "SP", "a <esc>h", { noremap = true, silent = true, desc = "Insert space after cursor" })
+-- insert tab(\t) [I]dentation
+-- vim.keymap.set('n', "Si", "i    <esc>", { noremap = true, silent = true, desc = "Insert tab after cursor" })
+-- insert '[<split symbol>]<space>'
+-- vim.keymap.set('n', "S,", "i, <esc>hh", { noremap = true, silent = true, desc = "Insert a comma and a space after cursor" })
+
 --------------- Vanilla ---------------
 
 
 --------------- Plugins based ---------------
-
--- S: Refactor, Git & Diagnostics
--- unset S
-vim.keymap.set('n', 'S', '<Nop>', { silent = true })
--- Refactor (S)
-vim.keymap.set('n', 'Sr', function() vim.lsp.buf.rename() end, { desc = "LSP: Rename symbol" })
-vim.keymap.set('n', 'Sf', function() vim.lsp.buf.format({ async = true }) end, { desc = "LSP: Format buffer" })
-vim.keymap.set('n', 'Sa', function() vim.lsp.buf.code_action() end, { desc = "LSP: Code action" })
--- Git (Sh)
-vim.keymap.set('n', 'Shs', '<cmd>Gitsigns stage_hunk<CR>', { desc = "Git: Stage hunk" })
-vim.keymap.set('n', 'Shr', '<cmd>Gitsigns reset_hunk<CR>', { desc = "Git: Reset hunk" })
-vim.keymap.set('n', 'Shb', '<cmd>Gitsigns blame_line<CR>', { desc = "Git: Blame line" })
-vim.keymap.set('n', 'Shp', '<cmd>Gitsigns preview_hunk<CR>', { desc = "Git: Preview hunk" })
-vim.keymap.set('n', 'Shd', '<cmd>Gitsigns diffthis<CR>', { desc = "Git: Diff this" })
--- Diagnostic (Sc)
-vim.keymap.set('n', 'Scq', function() vim.diagnostic.setloclist() end, { desc = "LSP: Quickfix diagnostics" })
-vim.keymap.set('n', 'Sn', function() vim.diagnostic.goto_next() end, { desc = "LSP: Next diagnostic" })
-vim.keymap.set('n', 'SN', function() vim.diagnostic.goto_prev() end, { desc = "LSP: Prev diagnostic" })
 
 -- toggle markdown rendering
 vim.keymap.set({'n', 'v'}, '<leader>mt', '<cmd>RenderMarkdown toggle<CR>', { desc = "Toggle markdown rendering" })

@@ -82,7 +82,7 @@ Leader is <kbd>Space</kbd> (shown as `␣`), localleader is `,` (LaTeX).
 | `Q` | Record macro (original `q`, followed by a register name) |
 | `Z` | Clear search highlight |
 | `R` | Replace all search matches — prompts `:%s//`, type `new/g⏎` (all) or `new/gc⏎` (confirm each) |
-| `S` | Prefix for Refactor / Git / Diagnostics chords — see [S-Prefix Chords](#s-prefix-chords) |
+| `S` | Prefix for quick insert chords — see [S-Prefix Chords](#s-prefix-chords) |
 | `viwp` / visual `p` | Paste over a word — visual `p` is remapped to preserve the register, so repeated `viwp` replaces multiple targets with the same yank |
 | `H` / `L` | Jump to first / last non-blank character of the line |
 | `_` / `g_` | Jump to top / bottom of the screen |
@@ -120,17 +120,13 @@ Leader is <kbd>Space</kbd> (shown as `␣`), localleader is `,` (LaTeX).
 
 Absolute line numbers and read-only (edits raise E21). Scroll mappings are mounted only while the mode is active — outside preview every key keeps its native meaning (`d` = delete, `u` = undo, `y` = yank). Preview also auto-exits when leaving the buffer (switching to neo-tree, terminal, or another file).
 
-### S-Prefix Chords (Refactor / Git / Diagnostics)
+### S-Prefix Chords (Quick insert)
 
 | Key | Action |
 |-----|--------|
-| `Sr` / `Sf` | LSP rename / format buffer |
-| `Sa` | LSP code action |
-| `Shs` / `Shr` | Git stage / reset hunk |
-| `Shb` / `Shp` | Git blame line / preview hunk |
-| `Shd` | Git diff entire buffer vs index |
-| `Scq` | Send diagnostics to quickfix |
-| `Sn` / `SN` | Next / previous diagnostic |
+| `SJ` / `SK` | Insert blank lines below/above current line | 
+| `SS` | Smart line split | 
+| `SN` | Split line after cursor | 
 
 ### File Tree (neo-tree)
 
